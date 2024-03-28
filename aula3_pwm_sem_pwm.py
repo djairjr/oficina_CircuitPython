@@ -16,9 +16,9 @@ inactive_time = 1 - duty_cicle
 
 while True:
   led.value = True
-  time.sleep (duty_cicle) # altere para duty_cicle * periodo_total
+  time.sleep (duty_cicle * periodo_total) 
   led.value = False
-  time.sleep (inactive_time) # altere para inactive_time * periodo total
+  time.sleep (inactive_time * periodo_total)
 
 
 
