@@ -1,6 +1,7 @@
 # Para todos os exemplos nesse código, utilize as ligações no diagrama aula3_bb.png
 # Como diminuir o brilho do LED usando persistencia da visão
 # Dê uma olhada nesse artigo aqui: https://en.wikipedia.org/wiki/Flicker_fusion_threshold
+# E também nesse aqui: https://siytek.com/how-does-led-dimming-work/
 
 import time, board
 from digitalio import DigitalInOut, Pull, Direction
