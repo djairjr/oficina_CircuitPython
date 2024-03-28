@@ -16,7 +16,11 @@ def map_range (valor_entrada, a_min, a_max, b_min, b_max):
 
 while True:
   # Pegue um valor de entrada que varia entre 0 e 65535
-  # e me dê um valor que varie entre 0 e 3.3
+  # e me dê um valor que varie entre 0 e 3.3´que é a tensão de saída máxima.
+  # Estou indicando a porcentagem aqui porque pode ser util depois...
+  
   tensao_saida = map_range (analog_in, 0, 65535, 0, 3.3)
+  porcentagem = map_range (analog_in, 0, 65535, 0, 100)
   print (tensao_saida)
+  print ('Porcentagem %d' % porcentagem + "%")
   time.sleep(0.1)
