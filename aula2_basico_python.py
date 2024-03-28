@@ -71,6 +71,9 @@ composição % b
 composição = 'O resultado é %s'
 composição % texto
 
+composição_mista = 'O resultado total é %d, %02d, %5.2f e %s' 
+composição_mista % (a,a,b,texto)
+
 # Entrada de Dados
 a = input ('Digite alguma coisa ') # Sempre String
 print ('Você digitou  %s' % a)
@@ -100,6 +103,19 @@ while x<3:
     print (x)
     x = x+1
 
+for n in range (10):
+        print (n)
+
+# Tuplas, Listas, Dicionários
+
+tupla = (0,1,2,3) # conjunto de dados imutável. Você pode acessar, mas não alterar
+tupla[2] # resulta 2
+tupla[2] = 3 # resulta em erro
+
+lista = ['palavra 1', '0', 2 ] # conjunto mutável de dados
+lista[0] = 0
+lista # resulta em [0,'0', 2]
+
 # Cria uma lista com numeros na faixa de 0 a 9
 lista = [n for n in range (10)]
 lista.append (10)
@@ -109,6 +125,19 @@ for x,e in enumerate(lista):
     print (x, e)
 
 # vê tudo que é possível fazer com a lista
-dir (lista) 
+dir (lista)
+
+# conjunto mutável de dados, acesso é feito pelo nome da chave
+dicionário = { 'Chave 1': 'Valor 1', 'Chave 2': 'Valor 2', 'Chave 3': 'Valor 3' }
+dicionário [0] # Resulta em erro. A chave não pode ser endereçada por índices
+dicionário ['Chave 1'] # Resulta 'Valor 1'
+
+# Lembrando que eu posso fazer qualquer combinação de lista de tuplas, tuplas de listas,
+# dicionários de tuplas, etc...
+cores = {'BLACK': (0,0,0), 'RED': (255,0,0), 'GREEN':(0,255,0), 'BLUE':(0,0,255)}
+red_amount, green_amount, blue_amount = cores['BLACK']
+red_amount # resulta em 0
+
+
     
 
