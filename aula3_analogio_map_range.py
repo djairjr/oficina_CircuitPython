@@ -9,6 +9,8 @@ from analogio import AnalogIn
 analog_in = AnalogIn (board.A1) # board.GP27
 
 # Criando uma função map_range que funciona como Arduino map
+# Se você quiser essa e outras funções que facilitam a vida
+# use from simpleio import *
 
 def map_range (valor_entrada, a_min, a_max, b_min, b_max):
   # Essa função é uma regra de três simples, na realidade
