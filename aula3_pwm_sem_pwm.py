@@ -9,6 +9,9 @@ from digitalio import DigitalInOut, Pull, Direction
 led = DigitalInOut (board.LED)
 led.direction = Direction.OUTPUT
 
+# Frequência é medida em Hertz. Indica a quantidade de ciclos de um evento por segundo
+# Nós estamos considerando como ciclo, o tempo em que o LED acende e apaga.
+
 frequencia = 60 # de 60 a 90hz a visão humana registra os pulsos como continuidade.
 periodo_total = 1 / frequencia
 
