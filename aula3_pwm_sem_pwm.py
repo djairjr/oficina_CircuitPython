@@ -11,6 +11,7 @@ led.direction = Direction.OUTPUT
 frequencia = 60 # de 60 a 90hz a visão humana registra os pulsos como continuidade.
 periodo_total = 1 / frequencia
 
+# Você consegue usar o potenciômetro para variar a intensidade do LED? Como?
 duty_cicle = int (input ( 'Digite a intensidade do LED em porcentagem (0 a 100%: )')) / 100
 inactive_time = 1 - duty_cicle
 
