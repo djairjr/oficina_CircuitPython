@@ -1,0 +1,1 @@
+Na aula 7, vamos aprender a reproduzir arquivos de Audio na Raspberry Pi Pico
