@@ -12,7 +12,7 @@ import builtins
 
 for palavra_chave in dir (builtins):
   
-  print (palavra_chave)
+    print (palavra_chave)
 
 
   
