@@ -1,5 +1,7 @@
 # Oficina de CircuitPython
-Uma lista com links interessantes para quem quiser estudar um pouco mais
+Os materiais e scripts que a gente está estudando no curso estão organizados por pastas agora.
+
+Abaixo uma lista com links interessantes para quem quiser estudar um pouco mais. Eu vou sempre colocar alguma coisa nova por aqui...
 
 # Python
 Curso Gratuito da Solyd, pra quem quiser aprender Python em português.(https://solyd.com.br/cursos/python-basico/)
