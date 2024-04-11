@@ -1,11 +1,8 @@
 """
-Example of writing to a card using the ``mfrc522`` module.
+Nesse caso, vamos descobrir como escrever algumas informações
+Nas TAGS RFID
 """
-
-# 3rd party
 import board
-
-# this package
 import mfrc522
 
 
@@ -15,7 +12,7 @@ def do_write():
 	rdr.set_antenna_gain(0x07 << 4)
 
 	print('')
-	print("Place card before reader to write address 0x08")
+	print("Coloque o Cartão para Escrever no Endereço 0x08")
 	print('')
 
 	try:
@@ -28,8 +25,8 @@ def do_write():
 				(stat, raw_uid) = rdr.anticoll()
 
 				if stat == rdr.OK:
-					print("New card detected")
-					print("  - tag type: 0x%02x" % tag_type)
+					print("Novo Cartão Detectado ")
+					print("  - tipo da tag: 0x%02x" % tag_type)
 					print("  - uid\t : 0x%02x%02x%02x%02x" % (raw_uid[0], raw_uid[1], raw_uid[2], raw_uid[3]))
 					print('')
 
@@ -43,13 +40,13 @@ def do_write():
 									)
 							rdr.stop_crypto1()
 							if stat == rdr.OK:
-								print("Data written to card")
+								print("Dados Escritos no Cartão")
 							else:
-								print("Failed to write data to card")
+								print("Falha ao Escrever Dados")
 						else:
-							print("Authentication error")
+							print("Erro de Autenticação")
 					else:
-						print("Failed to select tag")
+						print("Falha ao selecionar Cartão")
 
 	except KeyboardInterrupt:
 		print("Bye")
