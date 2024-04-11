@@ -5,8 +5,11 @@ import time
 import adafruit_matrixkeypad
 import adafruit_pcf8574
 
-i2c = busio.I2C (scl=board.SCL, sda=board.SDA)
-pcf = adafruit_pcf8574.PCF8574(i2c)
+SDA_Pin = board.GP20
+SCL_Pin = board.GP21
+
+i2c = busio.I2C (scl=SCL_Pin, sda=SDA_Pin)
+pcf = adafruit_pcf8574.PCF8574(i2c) # Talvez precise adicionar o Address
 
 ''' Eu costumo soldar o Keypad direto no PCF8574'''
 rows = [pcf.get_pin(5), pcf.get_pin(0), pcf.get_pin(1), pcf.get_pin(3)]
