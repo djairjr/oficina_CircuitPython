@@ -1,3 +1,4 @@
+# Vamos testar diversos módulos I2C e descobrir os seus endereços
 import board, busio
 pin_scl = board.GP21
 pin_sda = board.GP20
