@@ -1,4 +1,5 @@
 ''' Usando Expansor de Portas PCF8574 com Keypad '''
+''' Vamos descobrir primeiro o endereço do PCF8574 ou PCF8575 '''
 import board
 import busio
 import time
