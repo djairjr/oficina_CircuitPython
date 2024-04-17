@@ -67,5 +67,12 @@ Adafruit_RTTTL - Tocando Ringtones no Buzzer (https://wokwi.com/projects/3936050
 
 Lista com vários RTTTL para tocar. (https://github.com/neverfa11ing/FlipperMusicRTTTL)
 
+# Só para os Displays diversos:
+LCD Character Creator for Circuitpython and Micropython - (https://educ8s.tv/tools/lcd-character-creator/)
+
+Conversor de fontes TTF para BDF - (https://www.fontconverter.org/)
+
+
+
 
 
