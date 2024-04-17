@@ -31,6 +31,8 @@ Basicamente o algoritmo para usar um display é sempre o mesmo:
 Além dos exemplos que eu estou disponibilizando aqui no Github, dêem uma olhada nessa solução divertida para Screensaver:
 https://github.com/todbot/circuitpython_screensaver
 
+O Tod Bot mantém uma lista bem atualizada com vários truques para Circuitpython. Para converter os Bitmaps para o formato compatível com Circuitpython, sugiro a leitura dessa dica aqui: https://github.com/todbot/circuitpython-tricks?tab=readme-ov-file#preparing-images-for-circuitpython
+
 
 
   
