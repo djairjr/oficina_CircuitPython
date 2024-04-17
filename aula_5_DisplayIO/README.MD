@@ -10,14 +10,25 @@ o Circuitpython vai tratar da mesma forma, o que facilita muito a nossa memoriza
 Basicamente o algoritmo para usar um display é sempre o mesmo:
 
 1- Importar o módulo board, para utilizar os pinos da placa
+
 2- Importar o módulo busio, para gerenciar os buses a serem utilizados (opcional)
+
 3- Importar o módulo displayio
+
 4- Importar biblioteca de inicialização específica do display utilizado
+
 5- Importar bibliotecas auxiliares para fontes, bitmaps, textos, figuras geométricas
+
 6- Liberar os displays
+
 7- Inicializar os Buses (SPI ou I2C)
+
 8- Configurar o Bus utilizado pelo Display
+
 9- Configurar o display em si.
+
+
+
 
 
   
