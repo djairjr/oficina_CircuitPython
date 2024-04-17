@@ -28,6 +28,8 @@ Basicamente o algoritmo para usar um display é sempre o mesmo:
 9- Configurar o display em si.
 
 
+Além dos exemplos que eu estou disponibilizando aqui no Github, dêem uma olhada nessa solução divertida para Screensaver:
+https://github.com/todbot/circuitpython_screensaver
 
 
 
