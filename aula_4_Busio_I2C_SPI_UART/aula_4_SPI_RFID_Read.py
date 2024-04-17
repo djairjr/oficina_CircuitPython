@@ -4,6 +4,13 @@ import time
 from os import uname
 import digitalio
 
+# Nesse código, eu estou criando trê variáveis para facilitar
+# a implementação por senha de teclado também
+
+unlocked = False
+rfidDetected = False
+passwordCorrect = False
+
 led = digitalio.DigitalInOut(board.LED)
 led.direction = digitalio.Direction.OUTPUT
 led.value = True
@@ -21,10 +28,13 @@ def do_read():
   print("")
 
   try:
-    while True:
+    while not unlocked:
+      # Faz a leitura de uma Tag. Retorna Status e tipo da Tag
       (stat, tag_type) = rdr.request(rdr.REQIDL)
 
+      # Com Status OK
       if stat == rdr.OK:
+        # Checa Status e a UID da Tag
         (stat, raw_uid) = rdr.anticoll()
         if stat == rdr.OK:
           led.value = False
@@ -43,10 +53,17 @@ def do_read():
               rdr.stop_crypto1()
             else:
               print("Autenticado")
+              rfidDetected = True
           else:
             print("Acesso Negado")
-            
-          #time.sleep(.5)
+            rfidDetected = False
+
+          # Qual seria o código para detectar também um teclado?
+          # Matrix Keypad, via I2C?
+          
+          if (rfidDetected and passwordCorrect):
+            unlocked = True
+
           led.value = True
           
   except KeyboardInterrupt:
