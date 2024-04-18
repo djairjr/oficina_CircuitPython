@@ -1,28 +1,36 @@
-import board
-import busio
-import gifio
+import board, busio, time, os
 import displayio
-import time
-# Aqui você vai importar a biblioteca para o seu display
-# import adafruit_ili9341
-# import gc9a01
-import adafruit_st7789
+import terminalio
+import gifio
+from fourwire import FourWire
 
-dc=board.D1
-rst=board.D0	
-cs=board.D2 #My display does not have it...
-i2c = busio.I2C( board.SCL, board.SDA, frequency=200_000)
-displayio.release_displays()
-spi = busio.SPI(clock=board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+from adafruit_display_text import label
+from adafruit_st7789 import ST7789
 
+tft_lite = board.GP7
+tft_dc = board.GP6
+tft_cs = board.GP5
+sck=board.GP2
+mosi=board.GP3
 
-display_bus = displayio.FourWire(spi, command = dc, chip_select=cs, reset=rst)
+spi = busio.SPI(clock=sck, MOSI=mosi)
+while not spi.try_lock():
+    pass
+spi.configure(baudrate=24000000) # Configure SPI for 24MHz
+spi.unlock()
 
-display = adafruit_ili9341.ILI9341(display_bus, width=320, height=240)
-display.root_group.hidden = True # HIDE REPL
-display.auto_refresh = False
+display_bus = FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=board.GP4)
+display = ST7789(
+    display_bus,
+    width=240,
+    height=240,
+    rowstart=80,
+    rotation=0,
+    backlight_pin=tft_lite,
+)
+# Make the display context
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 odg = gifio.OnDiskGif('/images/circlescv.gif')
 odg.next_frame() # Load the first frame
@@ -37,5 +45,7 @@ while True:
     odg.next_frame()
     display.refresh()
     #time.sleep(0.1)
+
+
 
 
