@@ -1,7 +1,7 @@
-# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams, written for Adafruit Industries
-# SPDX-License-Identifier: MIT
 """
-This example runs on an Seeed Xiao RP2040
+Neopixel tem um hack bacana, que é uma biblioteca que se beneficia da 
+velocidade do barramento SPI. É a Neopixel_spi.
+Aqui eu estou usando as bibliotecas que eu customizei 
 """
 import board, time, os
 from analogio import AnalogIn
