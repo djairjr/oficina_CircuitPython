@@ -13,7 +13,7 @@ Vale dizer que as fitas consomem bastante corrente e você vai perceber que em t
 Isso é porque a gente está usando a corrente da USB do nosso computador, sem fonte externa. Se você alimentar as fitas led com uma 
 fonte externa, lembre-se de ao menos interligar o pino GND entre a fonte externa e a alimentação via USB da controladora. Você também pode alimentar a sua Raspberry Pi Pico na mesma fonte conectando diretamente os pinos 5V e GND à saída da fonte.
 
-Os códigos que eu estou compartilhando nesta aula vão ser a matéria inicial da próxima oficina, que vai acontecer no Sesc 24 de maio, a partir do dia 9/05.
+Os códigos que eu estou compartilhando nesta aula vão ser a matéria inicial da próxima oficina, que vai acontecer no Sesc 24 de maio, a partir do dia 9/05. (https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/ArcadeNeoPixel.MD)
 
 O desafio da próxima oficina vai ser recriar alguns clássicos dos Arcades usando matrizes de fita led como display. As bibliotecas disponíveis para usar as fitas led como display ainda não dispõem de algumas funcionalidades, então eu estou fazendo as customizações necessárias para a gente poder utilizar como display de jogo.
 
