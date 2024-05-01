@@ -89,4 +89,6 @@ Quando a cabeça da serpente for movida para uma posição, preciso testar se es
 Se for da mesma cor da serpente, é sinal que houve colisão com o corpo.
 Se for da mesma cor da maçã, preciso aumentar o tamanho da serpente.
 
-A biblioteca padrão não tem um método para retornar a cor do pixel na posição x,y determinada, mas eu vou criar um.
+A biblioteca padrão não tem um método para retornar a cor do pixel na posição x,y determinada.
+
+A gente consegue obter a cor de um Pixel na fita led se souber o endereço do pixel. Mas a TileGrid não tem um método reverso, isso é, um método em que você entre a coordenada do pixel e receba a posição dele na fita e ainda, a cor.
