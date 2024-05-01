@@ -9,17 +9,17 @@ coordenadas da tela corretas.
 
 Os painéis são arranjados da maneira abaixo, em Zig Zag.
 
-![Arranjo Atual](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/Array%20Neopixel%20-%20Coordenadas.png)
+![Arranjo Atual](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/images/Array%20Neopixel%20-%20Coordenadas.png)
 
 Quando você os conecta em cascata, o endereço do primeiro pixel (0) no próximo painel vai ser 
 256. Faz sentido se você for conectando os painéis em cascata horizontalmente. 
 
-![Dois Painéis](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/Default%20Framebuf%20Library.png)
+![Dois Painéis](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/images/Default%20Framebuf%20Library.png)
 
 Mas se você for usar outra disposição, por exemplo, com os paíneis posicionados verticalmente, 
 um em cima  do  outro, o ideal era que o primeiro pixel do segundo painel tivesse o endereço 8. 
 
-![Melhor assim](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/New%20Coords.png)
+![Melhor assim](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/images/New%20Coords.png)
 
 Na biblioteca padrão, isso não é possível. Por isso eu tive que escrever  uma  rotina  python
 para resolver esse problema.
