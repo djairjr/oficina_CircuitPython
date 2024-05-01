@@ -7,4 +7,4 @@ um arranjo de duas placas 8x32 de modo a conseguir 8x64, porque esse é  o  flux
 conexões numa Fita Led. Mas se você quiser arranjar algo com 16x32, não vai conseguir ter  as
 coordenadas da tela corretas.
 
-(https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/Array%20Neopixel%20-%20Coordenadas.png?raw=true)
+![Arranjo Atual](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/Array%20Neopixel%20-%20Coordenadas.png)
