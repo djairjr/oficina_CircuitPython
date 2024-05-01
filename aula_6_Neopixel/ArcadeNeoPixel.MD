@@ -19,7 +19,7 @@ Quando você os conecta em cascata, o endereço do primeiro pixel (0) no próxim
 Mas se você for usar outra disposição, por exemplo, com os paíneis posicionados verticalmente, 
 um em cima  do  outro, o ideal era que o primeiro pixel do segundo painel tivesse o endereço 8. 
 
-![Melhor assim] (https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/New%20Coords.png)
+![Melhor assim](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/New%20Coords.png)
 
 Na biblioteca padrão, isso não é possível. Por isso eu tive que escrever  uma  rotina  python
 para resolver esse problema.
