@@ -22,3 +22,7 @@ A nossa Raspberry Pi Pico roda num dual core Arm Cortex M0+, com 133Mhz, com 264
 Já estão rolando experiências com ela, rodando vídeo em DVI e alguns jogos. A tela de LCD que a gente usou no curso tinha 320x240 pixels.
 
 Será que é possível trazer de volta os clássicos usando essa plaquinha?
+
+Olha que bacana o que essa garota anda fazendo: https://www.youtube.com/watch?v=3kdM9wyglnw&t=735s&ab_channel=Kari
+
+Ela está usando os livros da Usborne e recriando alguns jogos em Python. Legal demais!
