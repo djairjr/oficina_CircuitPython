@@ -32,6 +32,6 @@ https://github.com/todbot/circuitpython-tricks
 A observação dele sobre os bufferes de audio e a utilização de audiomixer vai salvar a sua vida.
 Sério.
 
-_The default buffer used by the audio system is quite small. This means you'll hear corrupted audio if CircuitPython is doing anything else (having CIRCUITPY written to, updating a display). To get around this, you can use audiomixer to make the audio buffer larger. Try buffer_size=2048 to start. A larger buffer means a longer lag between when a sound is triggered when its heard._
+>_The default buffer used by the audio system is quite small. This means you'll hear corrupted audio if CircuitPython is doing anything else (having CIRCUITPY written to, updating a display). To get around this, you can use audiomixer to make the audio buffer larger. Try buffer_size=2048 to start. A larger buffer means a longer lag between when a sound is triggered when its heard._
 
 
