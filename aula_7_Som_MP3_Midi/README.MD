@@ -25,5 +25,8 @@ https://learn.adafruit.com/mp3-playback-rp2040/pico-mp3
 
 # Tocando arquivos MP3 e WAV direto na controladora, via barramento I2S
 A mesma observação sobre velocidade e ruídos vale aqui. Funciona bem se for apenas um player de audio. Mas eu acho a melhor solução, porque a plaquinha MAX98357A já é um amplificador Mono de 3W e a resposta sonora é muito boa! Eu sugiro que você compre da China, em quantidade superior a 5 peças. Vai sair o preço de duas, no Mercado Livre.
+Um bom tutorial sobre isso é esse aqui: https://learn.adafruit.com/mp3-playback-rp2040/pico-i2s-mp3
+Toda essa sequência de truques do TodBot é excelente, mas vale a parte de audio, porque é a praia dele:
+https://github.com/todbot/circuitpython-tricks
 
 
