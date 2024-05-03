@@ -81,3 +81,14 @@ Então eu embuti isso aí numa cópia da PixelGrid. E criei a tilegrid.
 A maratona toda dessa adaptação eu estou compartilhando no Hackster.io https://www.hackster.io/nicolaudosbrinquedos/circuitpython-tiled-neopixel-panel-446b73
 
 Para criar os jogos, ainda falta trabalhar em detecção de colisões, velocidade de atualização da tela, som, movimento usando joystick e cálculo de pontuação...
+
+# Detectando colisões
+Agora eu preciso criar uma rotina que retorne o valor da cor do pixel, recebendo as coordenadas x e y. Porque?
+No jogo Snake, a maçã é um objeto de uma cor. A serpente, de outra cor. E o fundo do mapa, está em preto.
+Quando a cabeça da serpente for movida para uma posição, preciso testar se essa nova posição tem uma cor diferente de preto.
+Se for da mesma cor da serpente, é sinal que houve colisão com o corpo.
+Se for da mesma cor da maçã, preciso aumentar o tamanho da serpente.
+
+A biblioteca padrão não tem um método para retornar a cor do pixel na posição x,y determinada.
+
+A gente consegue obter a cor de um Pixel na fita led se souber o endereço do pixel. Mas a TileGrid não tem um método reverso, isso é, um método em que você entre a coordenada do pixel e receba a posição dele na fita e ainda, a cor.
