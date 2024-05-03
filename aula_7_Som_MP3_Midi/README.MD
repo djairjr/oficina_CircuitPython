@@ -16,6 +16,7 @@ O incoveniente desse tipo de player é a ausência de possibilidade de se acessa
 
 # Players de MP3 Externos, funcionando por SPI
 O que eu mais utilizei foi o VS1053, que é uma excelente alternativa. Você consegue acesso direto ao SD Card, possui suporte a arquivos midi e OGG e é bem mais rápido que as versões Seriais. O maior problema é o custo. É bastante comum você encontrá-lo como um Shield para Arduino https://www.sparkfun.com/products/12660, mas existe a opção de comprar a placa em outro formato também.
+A biblioteca para ele é essa aqui: https://github.com/adafruit/Adafruit_CircuitPython_VS1053
 
 # Tocando arquivos MP3 e WAV Direto na controladora, via Decoder e saída PWM
 Essa novidade começou a aparecer com microcontroladores mais rápidos, como o RP2040 e até a ESP32.
