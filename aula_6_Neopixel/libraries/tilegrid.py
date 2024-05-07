@@ -175,8 +175,8 @@ def reverse_y_mapper(height, mapper):
     return y_mapper
 
 class GridGenerator:
-    """ Gera o Grid sem computar a rotação """
-    """ Checar Adafruit_Framebuf para ver como atualizar coordenadas dependendo da rotação """
+    """ Generate Grid """
+    """ Still need to check coordinates after rotation """
     
     def __init__(self, width, height, tile_num):
         self.width = width
@@ -184,7 +184,7 @@ class GridGenerator:
         self.tile_num = tile_num
 
     def single_tile(self):
-        # Gerador para um único tile
+        # Generate a Single Tile (Only One Panel)
         for i in range(self.width * self.height):
             group_index = i // self.height
             ascending = (group_index % 2) == 0
@@ -203,6 +203,7 @@ class GridGenerator:
             if number_within_group == self.height - 1:
                 yield tuple(temp)
 
+    # Now, generate multiple tiles, aligned
     def multi_tile(self, original_matrix):
         multi_temp = []
         factor = self.tile_num - 1
@@ -220,7 +221,7 @@ class GridGenerator:
         return multi_temp
 
     def grid(self):
-        # Obter a matriz de tiles
+        # Return Tile Grid
         position = self.multi_tile(list(self.single_tile()))
         return position
 
