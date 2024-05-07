@@ -51,10 +51,11 @@ class TileGrid:
         self.height = height
         self.width = width
         self.tile_num = tile_num
+        self.generator = GridGenerator(self.width, self.height, self.tile_num)
 
         if self.tile_num > 1: # Check if you have more than one tile
             # And if you have, call that special function...
-            mapper = generate_grid(self.width, self.height, self.tile_num)
+            mapper = self.generator.grid()
             for m in mapper:
                 self._x.append(
                     PixelMap(
@@ -118,6 +119,18 @@ class TileGrid:
         Shows the pixels on the underlying strip.
         """
         self._pixels.show()
+    
+    def get_pixel(self, x,y):
+        """
+        Return Pixel Position in Led Stripe
+        """
+        return self.generator.get_value (x,y)
+    
+    def get_color(self, x,y):
+        """
+        Return Pixel Color
+        """
+        return self._pixels[self.get_pixel (x,y)]
 
     @property
     def auto_write(self):
@@ -130,9 +143,6 @@ class TileGrid:
     def auto_write(self, value):
         self._pixels.auto_write = value
     
-  
-
-
 def reverse_x_mapper(width, mapper):
     """
     Returns a coordinate mapper function for grids with reversed X coordinates.
@@ -164,53 +174,57 @@ def reverse_y_mapper(height, mapper):
 
     return y_mapper
 
-"""
-Essa é a função que eu desenvolvi. Não é muito elegante,
-porque cria uma lista de tuplas com as coordenadas todas.
-Isso consome memória. A função desenvolvida pela adafruit
-é muito melhor, mas eu ainda não tenho a manha de fazer
-algo parecido...
-"""
-def generate_grid(width, height, tile_num): 
-    def single_tile_coord():
-        single_tile = []
+class GridGenerator:
+    """ Gera o Grid sem computar a rotação """
+    """ Checar Adafruit_Framebuf para ver como atualizar coordenadas dependendo da rotação """
+    
+    def __init__(self, width, height, tile_num):
+        self.width = width
+        self.height = height
+        self.tile_num = tile_num
 
-        for i in range(width * height):
-            group_index = i // height
+    def single_tile(self):
+        # Gerador para um único tile
+        for i in range(self.width * self.height):
+            group_index = i // self.height
             ascending = (group_index % 2) == 0
-            number_within_group = i % height
-
-            if ascending:
-                number = group_index * height + number_within_group
-            else:
-                number = (group_index + 1) * height - 1 - number_within_group
+            number_within_group = i % self.height
 
             if number_within_group == 0:
                 temp = []
 
-            temp.append (number)
+            if ascending:
+                number = group_index * self.height + number_within_group
+            else:
+                number = (group_index + 1) * self.height - 1 - number_within_group
 
-            if number_within_group == height - 1:
-                single_tile.append(tuple(temp))
+            temp.append(number)
 
-        return single_tile
+            if number_within_group == self.height - 1:
+                yield tuple(temp)
 
-    def multi_tile(original_matrix): 
+    def multi_tile(self, original_matrix):
         multi_temp = []
-        factor = tile_num - 1
-        
+        factor = self.tile_num - 1
+
         if factor == 0:
             multi_temp = original_matrix
         else:
             for tup in original_matrix:
-                modified_tuple = tup[:height]  
+                modified_tuple = tup[:self.height]
 
-                for n in range (factor):
-                    modified_tuple += tuple(num + (factor * (width * height)) for num in tup[:height])          
-                    multi_temp.append(modified_tuple)
+                for n in range(factor):
+                    modified_tuple += tuple(num + (factor * (self.width * self.height)) for num in tup[:self.height])
+                multi_temp.append(modified_tuple)
 
         return multi_temp
 
-    default_tile = single_tile_coord()
-    return multi_tile(default_tile) 
+    def grid(self):
+        # Obter a matriz de tiles
+        position = self.multi_tile(list(self.single_tile()))
+        return position
 
+    def get_value(self, x, y):
+        # Obter o valor na posição (x, y) no grid
+        pixel_value = self.grid()
+        return pixel_value[x][y]

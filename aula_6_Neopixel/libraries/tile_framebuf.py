@@ -1,9 +1,5 @@
 """
 My Tile_framebuf
-Adaptação que eu fiz da biblioteca original da Adafruit para poder
-criar uma tela usando Neopixel.
-
-Tutorial completinho lá no Hackster: https://www.hackster.io/nicolaudosbrinquedos/circuitpython-tiled-neopixel-panel-446b73
 """
 
 # imports
@@ -12,7 +8,7 @@ try:
 except ImportError:
     pass
 
-import adafruit_framebuf
+import my_framebuf # My changed library
 
 # This is the original import. 
 # from adafruit_led_animation.grid import PixelGrid
@@ -26,7 +22,7 @@ VERTICAL: int = const(2)
 
 
 # pylint: disable=too-many-function-args
-class TileFramebuffer(adafruit_framebuf.FrameBuffer):
+class TileFramebuffer(my_framebuf.FrameBuffer):
     """
     NeoPixel and Dotstar FrameBuffer for easy drawing and text on a
     tile grid of either kind of pixel
@@ -73,7 +69,7 @@ class TileFramebuffer(adafruit_framebuf.FrameBuffer):
         self._buffer = bytearray(width * height * tile_num * 3)
         self._double_buffer = bytearray(width * height * tile_num *  3)
         super().__init__(
-            self._buffer, width, height * tile_num, buf_format=adafruit_framebuf.RGB888
+            self._buffer, width, height * tile_num, buf_format=my_framebuf.RGB888
         )
         self.rotation = rotation
 
