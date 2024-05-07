@@ -1,3 +1,5 @@
+""" Using Displayio Helpers """
+
 import time
 import board
 import neopixel_spi as neopixel
@@ -31,7 +33,7 @@ screen = TileFramebuffer(
 
 # Load the sprite sheet (bitmap)
 sprite_sheet, palette = adafruit_imageload.load(
-    # Image with 64 pixels width and 32 pixels height. Conteins four frames 16x32
+    # Image with 64 pixels width and 32 pixels height. Contains 16 frames 16x32
     "images/all_frames.bmp",
     bitmap=displayio.Bitmap,
     palette=displayio.Palette,
@@ -51,9 +53,8 @@ sprite = displayio.TileGrid(
     default_tile=0,
 )
 
-# Lógica para exibir os frames em sequência
 frame_index = 0  # índice do frame atual
-frame_delay = 0.02  # intervalo de tempo entre os frames (em segundos)
+frame_delay = 0.02  # This setting does not work...
 last_frame_time = time.monotonic()
 
 while True:
