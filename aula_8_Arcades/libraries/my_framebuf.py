@@ -29,6 +29,7 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_framebuf.git"
 
 import os
+import gc
 import struct
 
 # Framebuf format constants:
@@ -87,6 +88,7 @@ class BMPReader(object):
 
         # Extract pixel data
         self._pixel_data = img_bytes[start_pos:]
+        gc.collect()
       
 
 class GS2HMSBFormat:
@@ -365,6 +367,7 @@ class FrameBuffer:
         else:
             raise ValueError("invalid format")
         self._rotation = 0
+        gc.collect()
 
     @property
     def rotation(self):
@@ -603,6 +606,8 @@ class FrameBuffer:
 
                 # Set pixel on display buffer
                 self.pixel(x, y, (r, g, b))  # Set RGB color directly
+        
+        gc.collect()
 
     # pylint: enable=too-many-arguments
 
