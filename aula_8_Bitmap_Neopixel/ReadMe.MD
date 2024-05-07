@@ -14,15 +14,16 @@ O que pra nós parece uma loucura hoje em dia. Mas foi isso o que me possibilito
 
 Os computadores daquela época tinham pouquíssimos recursos, se comparados com os de hoje em dia.
 
-Meu melhor computador na época, o MSX Hotbit HB8000 https://pt.wikipedia.org/wiki/HotBit_HB-8000, possuia um processador Z80 que funcionava em 3,58Mhz, memória RAM de 64Kb, Video Ram de 16KB
-e seu sistema operacional ficava numa memória ROM de 32Kb compartilhado com um interpretador BASIC. A resolução de vídeo era de 256x192, mas
-muitos jogos rodavam em 64x48.
+Meu melhor computador na época, o MSX Hotbit HB8000 https://pt.wikipedia.org/wiki/HotBit_HB-8000, possuia um processador Z80 que funcionava em 3,58Mhz, memória RAM de 64Kb, Video Ram de 16KB e seu sistema operacional ficava numa memória ROM de 32Kb compartilhado com um interpretador BASIC. A resolução de vídeo era de 256x192, mas muitos jogos rodavam em 64x48.
 
 A nossa Raspberry Pi Pico roda num dual core Arm Cortex M0+, com 133Mhz, com 264kB de sRam e 2Mb de memória flash (onde fica nosso Circuitpython e o USB disk).
-Já estão rolando experiências com ela, rodando vídeo em DVI e alguns jogos. A tela de LCD que a gente usou no curso tinha 320x240 pixels.
+Já estão rolando experiências com ela, rodando vídeo em DVI e alguns jogos. A tela de LCD que a gente usou no curso do SESC Santana tinha 320x240 pixels.
 
 Será que é possível trazer de volta os clássicos usando essa plaquinha?
 
 Olha que bacana o que essa garota anda fazendo: https://www.youtube.com/watch?v=3kdM9wyglnw&t=735s&ab_channel=Kari
 
 Ela está usando os livros da Usborne e recriando alguns jogos em Python. Legal demais!
+
+# Esquema de montagem para o nosso Console Arcade
+![Esquema de Montagem](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_8_Bitmap_Neopixel/images/Xiao_Neopixel_bb.png?raw=true)
