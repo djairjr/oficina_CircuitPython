@@ -93,3 +93,4 @@ class TileFramebuffer(my_framebuf.FrameBuffer):
                         index : index + 3
                     ]
         self._grid.show()
+

@@ -1,10 +1,8 @@
 """
-Eu estou trabalhando ainda nesse código. 
-O original está aqui: https://github.com/stuartm2/CircuitPython_BMP_Reader
-Com a ajuda do Chat GPT, eu cheguei nessa versão, que lê o arquivo BMP e consegue
-salvar uma lista de tuplas RGB.
-Perfeito.
+Working in progress code...
+The original is here: https://github.com/stuartm2/CircuitPython_BMP_Reader
 
+This version read files with any dimensions.
 """
 
 class BMPReader(object):

@@ -39,7 +39,7 @@ MHMSB = 3  # Single bit displays like the Sharp Memory
 RGB888 = 4  # Neopixels and Dotstars
 GS2_HMSB = 5  # 2-bit color displays like the HT16K33 8x8 Matrix
 
-# Adding BMP Reader
+# Adding Simple BMP Reader
 class BMPReader(object):
     def __init__(self, filename):
         self._filename = filename
@@ -47,15 +47,14 @@ class BMPReader(object):
 
     def get_pixels(self):
         pixel_grid = []
-        pixel_data = list(self._pixel_data)  # Trabalhamos com uma cópia
-
-        bytes_per_pixel = 3  # Assumindo 24-bit color depth (RGB)
+        pixel_data = list(self._pixel_data)  # Make a copy
+        bytes_per_pixel = 3  # Assuming 24-bit color depth (RGB)
         row_size = self.width * bytes_per_pixel
 
         for y in range(self.height):
             row = []
             for x in range(self.width):
-                # Cálculo do índice do pixel no vetor de dados
+                # Calculate index of data vector
                 idx = (y * row_size) + (x * bytes_per_pixel)
                 b = pixel_data[idx]
                 g = pixel_data[idx + 1]
@@ -74,19 +73,19 @@ class BMPReader(object):
         with open(self._filename, 'rb') as f:
             img_bytes = bytearray(f.read())
 
-        # Verificação do formato BMP
-        assert img_bytes[0:2] == b'BM', "Não é um arquivo BMP válido"
+        # Check BMP compatibility
+        assert img_bytes[0:2] == b'BM', "Not a valid BMP"
         assert lebytes_to_int(img_bytes[30:34]) == 0, \
-            "A compressão não é suportada"
+            "Compression isn't supported"
         assert lebytes_to_int(img_bytes[28:30]) == 24, \
-            "A profundidade de cor de 24 bits é a única suportada"
+            "Only 24bit color depth is supported"
 
-        # Extração das dimensões da imagem
+        # Extract image info
         start_pos = lebytes_to_int(img_bytes[10:14])
         self.width = lebytes_to_int(img_bytes[18:22])
         self.height = lebytes_to_int(img_bytes[22:26])
 
-        # Extração dos dados dos pixels
+        # Extract pixel data
         self._pixel_data = img_bytes[start_pos:]
       
 
@@ -568,9 +567,8 @@ class FrameBuffer:
                     self._font.draw_char(char, char_x, y, self, color, size=size)
             y += height * size
     
-    # Different Method    No Pillow Needed (Good for Neopixels)
-  
     def simple_image(self, bmp_filename):
+        # Different Method    No Pillow Needed (Good for Neopixels)
         # Determine effective width/height, considering rotation
         width = self.width
         height = self.height
@@ -583,7 +581,16 @@ class FrameBuffer:
 
         # Check image dimensions
         if len(pixels) != height or len(pixels[0]) != width:
-            raise ValueError(f"Image must be {width}x{height} pixels.")
+            # Determine the bounds for cropping
+            crop_width = min(len(pixels[0]), width)  # Use the minimum of image width and screen width
+            crop_height = min(len(pixels), height)  # Use the minimum of image height and screen height
+            
+            # Crop the image to match the screen dimensions
+            pixels = [row[:crop_width] for row in pixels[:crop_height]]
+
+            # Update the width and height based on the cropped image
+            width = crop_width
+            height = crop_height
 
         # Clear buffer
         self.fill(0)  # Assuming '0' represents black
@@ -596,9 +603,6 @@ class FrameBuffer:
 
                 # Set pixel on display buffer
                 self.pixel(x, y, (r, g, b))  # Set RGB color directly
-
-        # Optionally handle display update here
-        # self.update_display()  # Update display after setting all pixels
 
     # pylint: enable=too-many-arguments
 
