@@ -1,3 +1,4 @@
+""" This example open four bitmap frames in images directory """
 import time
 import board
 import neopixel_spi as neopixel
