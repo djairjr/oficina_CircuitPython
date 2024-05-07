@@ -44,7 +44,7 @@ sprite_sheet, palette = adafruit_imageload.load(
 sprite = displayio.TileGrid(
     sprite_sheet,
     pixel_shader=palette,
-    width=4,
+    width=16,
     height=1,
     tile_width=16,
     tile_height=32,
