@@ -79,8 +79,7 @@ while True:
             # Exibir o pixel na tela Neopixel (formato RGB de 24 bits)
             neopixel_color = (r, g, b)
             screen.pixel(x, y, neopixel_color)
-    # Atualizar a exibição
-    screen.display()
+
 
     # Verifica se é hora de exibir o próximo frame
     current_time = time.monotonic()
@@ -90,3 +89,6 @@ while True:
 
         # Atualizar o tempo do último frame exibido
         last_frame_time = current_time
+    
+    # Atualizar a exibição
+    screen.display()
