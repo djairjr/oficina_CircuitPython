@@ -21,6 +21,8 @@ Já estão rolando experiências com ela, rodando vídeo em DVI e alguns jogos. 
 
 Será que é possível trazer de volta os clássicos usando essa plaquinha?
 
+https://www.youtube.com/watch?v=Oo47qPvs3HQ&t=0s&ab_channel=Kari
+
 Olha que bacana o que essa garota anda fazendo: https://www.youtube.com/watch?v=3kdM9wyglnw&t=735s&ab_channel=Kari
 
 Ela está usando os livros da Usborne e recriando alguns jogos em Python. Legal demais!
