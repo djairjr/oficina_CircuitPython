@@ -32,7 +32,7 @@ possuia um processador Z80 que funcionava em 3,58Mhz, memória RAM de 64Kb, Vide
 e seu sistema operacional ficava numa memória ROM de 32Kb compartilhado com um interpretador BASIC. 
 A resolução de vídeo era de 256x192 (modo gráfico), mas muitos jogos rodavam em 64x48 (modo caractere).
 
-A nossa Raspberry Pi Pico roda num dual core Arm Cortex M0+, com 133Mhz, 
+As nossas Seeed Xiao ou Raspberry Pi Pico rodam num dual core Arm Cortex M0+, com 133Mhz, 
 com 264kB de sRam e 2Mb de memória flash (onde fica nosso Circuitpython e o USB disk).
 
 Já estão rolando experiências com ela, rodando vídeo em DVI e alguns jogos.
