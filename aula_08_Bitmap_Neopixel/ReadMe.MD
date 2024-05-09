@@ -42,6 +42,7 @@ https://blog.adafruit.com/2021/11/03/new-product-pimoroni-picosystem-rp2040-hand
 
 O desafio dessa oficina é portar alguns clássicos dos Arcades para essa plaquinha, usando uma tela de 32x16 pixels
 feita com Fitas de Led, numa configuração um pouco diferente da habitual.
+
 ![Painel com duas matrizes 8x32 em 16x32](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_06_Neopixel/images/Arranjo%20Necessario.png)
 
 Será que vai dar certo?
