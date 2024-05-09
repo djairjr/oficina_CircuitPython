@@ -1,5 +1,16 @@
+"""
+Aqui eu estou trabalhando numa versão do código para Snake
+que imprime a serpente direto na tela do terminal.
+A biblioteca curses desenha no terminal de texto do Linux
+Como eu tenho baixíssima resolução, preciso encontrar jogos
+que sejam executados no terminal de texto.
+E alterar o código para utilizar a Neopixel
+
+Esse código vai rodar em Python numa máquina Linux.
+"""
+
 import random
-import curses
+import curses 
 
 def reset_game():
     global snake_body, snake_x, snake_y, key

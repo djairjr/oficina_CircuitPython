@@ -1,7 +1,7 @@
 """
-Neopixel tem um hack bacana, que é uma biblioteca que se beneficia da 
-velocidade do barramento SPI. É a Neopixel_spi.
-Aqui eu estou usando as bibliotecas que eu customizei 
+Exemplo criado para aprender a tratar o Joystick
+Preenche a tela com arco-íris à medida que o usuário
+vai movendo o joystick. Para apagar, aperte o botão.
 """
 import board, time, os
 from analogio import AnalogIn
@@ -20,9 +20,11 @@ pixel_width = 32
 pixel_height = 8
 num_tiles = 2
 
+# Os dois eixos do Joystick na realidade são potenciômetros
 joystick_x = AnalogIn(board.A0)
 joystick_y = AnalogIn(board.A1)
 
+# O Thumbstick possui um botão integrado que é o que estou usando
 trigger = DigitalInOut (board.D2)
 trigger.direction = Direction.INPUT
 trigger.pull = Pull.UP
@@ -34,17 +36,7 @@ pixels = neopixel.NeoPixel_SPI(
     auto_write=False,
 )
 
-"""
-# Slow Version 
-pixels = neopixel.NeoPixel(
-    pixel_pin,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
-    brightness=0.1,
-    auto_write=False,
-)
-"""
-
-pixel_framebuf = TileFramebuffer(
+screen = TileFramebuffer(
     pixels,
     pixel_width,
     pixel_height,
@@ -52,6 +44,11 @@ pixel_framebuf = TileFramebuffer(
     rotation = 3
 )
 
+"""
+As duas rotinas abaixo utilizam o map_range da biblioteca simpleio
+para interpretar os valores analógicos no joystick e em seguida
+retornar um número para o movimento do pixel na tela.
+"""
 def get_x(pin, number):
     return map_range (pin.value, 200, 65535, - number //2 , number // 2) 
 
@@ -63,12 +60,12 @@ old_y = pixel_height * num_tiles // 2
 
 while True:
     if (not trigger.value):
-        pixel_framebuf.fill (0x000000)
+        screen.fill (0x000000)
     else:
         x_pos = old_x + int (get_x (joystick_x, pixel_width //4))
         y_pos = old_y + int (get_y (joystick_y, pixel_height // 2))
-        pixel_framebuf.line (old_y, old_x, y_pos, x_pos, colorwheel((time.monotonic()*50)%255))
-        pixel_framebuf.display()
+        screen.line (old_y, old_x, y_pos, x_pos, colorwheel((time.monotonic()*50)%255))
+        screen.display()
         time.sleep(0.1)
         old_x = x_pos
         old_y = y_pos
