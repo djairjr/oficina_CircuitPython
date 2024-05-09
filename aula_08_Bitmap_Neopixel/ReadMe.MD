@@ -1,7 +1,7 @@
 # Recriando os Clássicos
 
 # Esquema de montagem para o nosso Console Arcade
-![Esquema de Montagem](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_8_Bitmap_Neopixel/images/Xiao_Neopixel_bb.png?raw=true)
+![Esquema de Montagem](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_08_Bitmap_Neopixel/images/Xiao_Neopixel_bb.png?raw=true)
 
 
 Eu comecei a programar computadores em 1984, quando eu tinha 10 anos. 
