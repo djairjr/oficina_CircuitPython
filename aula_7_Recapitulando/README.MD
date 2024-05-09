@@ -73,10 +73,17 @@ Adafruit CircuitPython 9.0.4 on 2024-04-16; Seeeduino XIAO RP2040 with rp2040
 Qualquer comando que você digitar após >>> vai ser executado na sua plaquinha.
 
 # Listar todos os módulos disponíveis
+
+```
 help ('modules')
 
+```
 # Importar o Módulo 'builtins' que contém todas as palavras chave de Python
+
+```
 import builtins
+
+```
 
 # Mostrar uma lista com todas as palavras chave
 
@@ -317,6 +324,12 @@ No link abaixo, estão os exercícios da aula de Neopixel na oficina do Sesc San
 https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel
 
 O painel 8x32 que estamos utilizando é um arranjo em zig zag de uma fita de Led Neopixel.
+
+Eu tive que fazer algumas adaptações em bibliotecas da Adafruit para poder fazer outros
+arranjos com essas matrizes. Também criei um método para importar e exibir bitmaps nelas.
+
+Fiz um tutorial bacana lá no Hackster.io que você encontra aqui:
+https://www.hackster.io/nicolaudosbrinquedos/circuitpython-tiled-neopixel-panel-446b73
 
 
 
