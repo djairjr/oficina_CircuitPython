@@ -70,6 +70,8 @@ Lista com vários RTTTL para tocar. (https://github.com/neverfa11ing/FlipperMusi
 # Só para os Displays diversos:
 LCD Character Creator for Circuitpython and Micropython - (https://educ8s.tv/tools/lcd-character-creator/)
 
+BMP Converter - https://online-converting.com/image/convert2bmp/
+
 Conversor de fontes TTF para BDF - (https://www.fontconverter.org/)
 
 
