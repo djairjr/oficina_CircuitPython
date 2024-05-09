@@ -3,7 +3,6 @@
 # Esquema de montagem para o nosso Console Arcade
 ![Esquema de Montagem](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_08_Bitmap_Neopixel/images/Xiao_Neopixel_bb.png?raw=true)
 
-
 Eu comecei a programar computadores em 1984, quando eu tinha 10 anos. 
 Naquela época apareciam os primeiros microcomputadores domésticos e nas livrarias e bancas de jornal, começaram a pipocar livros e revistas
 sobre o assunto.
@@ -41,8 +40,18 @@ https://learn.adafruit.com/picodvi-arduino-library-video-out-for-rp2040-boards/o
 Já existem várias soluções de jogos, utilizando telas TFT SPI, como as que utilizamos lá no Sesc Santana.
 https://blog.adafruit.com/2021/11/03/new-product-pimoroni-picosystem-rp2040-handheld-gaming-system-pim559/
 
-O desafio dessa oficina é portar alguns clássicos dos Arcades para essa plaquinha, usando uma tela de 32x16 pixels feita com Fitas de Led.
+O desafio dessa oficina é portar alguns clássicos dos Arcades para essa plaquinha, usando uma tela de 32x16 pixels
+feita com Fitas de Led, numa configuração um pouco diferente da habitual.
+![Painel com duas matrizes 8x32 em 16x32](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_06_Neopixel/images/Arranjo%20Necessario.png)
 
 Será que vai dar certo?
 
+Todos os exemplos nesta pasta vão utilizar as minhas bibliotecas customizadas, contidas nesta pasta:
+https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_08_Bitmap_Neopixel/libraries 
+
+As imagens da experiência Bitmap Animado estão aqui:
+https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_08_Bitmap_Neopixel/images
+
+E as fontes Bitmap aqui:
+https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_08_Bitmap_Neopixel/fonts
 
