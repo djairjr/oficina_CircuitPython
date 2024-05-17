@@ -24,6 +24,8 @@ Awesome CircuitPython. (https://circuitpython.org/awesome)
 
 Tod Bot CircuitPython Tricks. (https://github.com/todbot/circuitpython-tricks)
 
+Tod Bot Speedup Led Animations. (https://todbot.com/blog/2022/10/21/speed-up-circuitpython-led-animations-10x/)
+
 Download CircuitPython. (https://circuitpython.org/downloads)
 
 Getting Started with Raspberry Pi Pico and CircuitPython. (https://learn.adafruit.com/getting-started-with-raspberry-pi-pico-circuitpython?view=all)
