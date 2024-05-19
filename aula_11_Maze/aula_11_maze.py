@@ -12,9 +12,10 @@
 import time
 import board, random
 import neopixel_spi as neopixel
-import displayio
-import adafruit_imageload
-from rainbowio import colorwheel
+
+from analogio import AnalogIn
+from digitalio import DigitalInOut, Direction, Pull
+from simpleio import map_range
 
 # My custom version
 from tile_framebuf import TileFramebuffer
@@ -25,6 +26,15 @@ pixel_width = 32
 pixel_height = 8
 num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
+
+joystick_x = AnalogIn(board.A0)
+joystick_y = AnalogIn(board.A1)
+
+trigger = DigitalInOut (board.D2)
+trigger.direction = Direction.INPUT
+trigger.pull = Pull.UP
+
+buzzer = board.D3
 
 pixels = neopixel.NeoPixel_SPI(
     spi,
@@ -41,6 +51,49 @@ screen = TileFramebuffer(
     rotation = 0
 )
 
+def get_x(pin):
+    return map_range (pin.value, 200, 65535, - 2 , 2) 
+
+def get_y(pin):
+    return map_range (pin.value, 200, 65535, - 2 , 2)
+
+def get_pixel_color(x, y):
+    # Ajusta as coordenadas com base na rotação da tela
+    if screen.rotation == 1:
+        x, y = y, x
+        x = screen._width - x - 1
+    elif screen.rotation == 2:
+        x = screen._width - x - 1
+        y = screen._height * screen._tile_num - y - 1
+    elif screen.rotation == 3:
+        x, y = y, x
+        y = screen._height * screen._tile_num - y - 1
+
+    # Verifica se as coordenadas ajustadas estão dentro dos limites válidos
+    if (0 <= x < screen._width) and (0 <= y < screen._height * screen._tile_num):
+        # Obtém o pixel ajustado da tela
+        rgbint = screen.format.get_pixel(screen, x, y)
+        return (rgbint // 256 // 256 % 256, rgbint // 256 % 256, rgbint % 256)
+
+    # Retorna preto (0, 0, 0) se estiver fora dos limites
+    return (0, 0, 0)
+
+# Função para definir a cor de um pixel específico
+def set_pixel_color(x, y, color):
+    screen.pixel(x, y, color)
+
+# Função para verificar se a nova posição é válida
+def is_valid_move(x, y):
+    if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
+        return False
+    color = get_pixel_color(x, y)
+    return color != (0, 255, 255)  # A cor das paredes é 0x00ffff
+
+# Função para verificar se o jogador alcançou o final
+def is_end(x, y):
+    color = get_pixel_color(x, y)
+    print(f"Verificando se ({x}, {y}) é o final: {color}")
+    return color == (0, 255, 0)  # A cor do final é 0x00ff00
 
 class Maze():
     def __init__(self, screen):
@@ -53,8 +106,26 @@ class Maze():
         self.__entry = 'e'
         self.__exit = 'x'
         self.maze = []
+        self.entry_x = 0
+        self.entry_y = 0
+        self.exit_x = 0
+        self.exit_y = 0
         self.generate()
         self.draw()
+  
+    def get_entry(self):
+        return self.entry_x, self.entry_y
+    
+    def get_exit(self):
+        return self.exit_x, self.exit_y
+
+    def set_entry(self,x,y):
+        self.entry_x = x
+        self.entry_y = y
+    
+    def set_exit(self,x,y):
+        self.exit_x = x
+        self.exit_y = y
     
     def redraw(self):
         self.maze = []
@@ -66,16 +137,18 @@ class Maze():
         for i in range(0, self.height):
             for j in range(0, self.width):
                 if (self.maze[i][j] == self.__unvisited):
-                    self.screen.pixel (i,j, 0x00ff00)
+                    self.screen.pixel (i,j, 0xffffff)
                     
                 elif (self.maze[i][j] == self.__cell):
                     self.screen.pixel (i,j, 0x000000)
                     
                 elif (self.maze[i][j] == self.__exit):
-                    self.screen.pixel (i,j, 0xffffff)
+                    self.screen.pixel (i,j, 0x00ff00)
+                    self.set_exit (i,j)
                     
                 elif (self.maze[i][j] == self.__entry):
                     self.screen.pixel (i,j, 0xff0000)
+                    self.set_entry (i,j)
                 else:
                     self.screen.pixel (i,j, 0x00ffff)
         screen.display()
@@ -298,3 +371,46 @@ class Maze():
                 break
 
 maze = Maze(screen)
+
+player_x, player_y = maze.get_entry()
+set_pixel_color(player_x, player_y, (255, 0, 0))
+
+
+while True:
+    time.sleep(0.1)  
+
+    # Obtém a direção do joystick
+    move_x = int (get_x(joystick_x))
+    move_y = int (get_y(joystick_y))
+
+    # Calcula a nova posição potencial do jogador
+    new_x = player_x + move_x
+    new_y = player_y + move_y
+    
+    # Verifica se a nova posição é válida
+    if is_valid_move(new_x, new_y):
+        if is_end(new_x, new_y):
+            print("Você alcançou o final do labirinto!")
+            set_pixel_color(player_x, player_y, (0, 0, 0))
+
+            # Atualiza a posição do jogador
+            player_x, player_y = new_x, new_y
+
+            # Define a nova cor da posição do jogador
+            set_pixel_color(player_x, player_y, (255, 0, 0))
+       
+            screen.display()
+            time.sleep(2)
+            break
+        else:
+            print ('Movendo para ', new_x, new_y)
+            # Apaga a cor da posição antiga do jogador
+            set_pixel_color(player_x, player_y, (0, 0, 0))
+
+            # Atualiza a posição do jogador
+            player_x, player_y = new_x, new_y
+
+            # Define a nova cor da posição do jogador
+            set_pixel_color(player_x, player_y, (255, 0, 0))
+       
+            screen.display()
