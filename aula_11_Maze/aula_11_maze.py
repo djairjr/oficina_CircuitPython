@@ -2,22 +2,33 @@
     Original code from Orestis Zekai
     in https://github.com/OrWestSide/python-scripts/blob/master/maze.py
     From Medium Article in: https://medium.com/swlh/fun-with-python-1-maze-generator-931639b4fb7e
-    Adapted by Djair Guilherme (Nicolau dos Brinquedos)
+    Adapted by Djair Guilherme (Nicolau dos Brinquedos) with a help from ChatGPT
     For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
     SESC Workshop - São Paulo - Brazil - May 2024
     Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
     Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 """
 
-import time
+import time, gc
 import board, random
 import neopixel_spi as neopixel
 
+# To display Level Change Message in Rainbow Marquee
+from adafruit_display_text.bitmap_label import Label
+from adafruit_bitmap_font import bitmap_font
+from displayio import Bitmap
+from rainbowio import colorwheel
+import terminalio
+
+# Treating Joystick
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
 
-# My custom version
+# Adding simple RTTTL Sound
+import adafruit_rtttl
+
+# My custom version of Library
 from tile_framebuf import TileFramebuffer
 spi = board.SPI()
 
@@ -51,6 +62,9 @@ screen = TileFramebuffer(
     rotation = 0
 )
 
+# Load Bitmap Font
+font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
+
 def get_x(pin):
     return map_range (pin.value, 200, 65535, - 2 , 2) 
 
@@ -58,7 +72,7 @@ def get_y(pin):
     return map_range (pin.value, 200, 65535, - 2 , 2)
 
 def get_pixel_color(x, y):
-    # Ajusta as coordenadas com base na rotação da tela
+    # Adjusting coordinates based on rotation
     if screen.rotation == 1:
         x, y = y, x
         x = screen._width - x - 1
@@ -69,33 +83,34 @@ def get_pixel_color(x, y):
         x, y = y, x
         y = screen._height * screen._tile_num - y - 1
 
-    # Verifica se as coordenadas ajustadas estão dentro dos limites válidos
+    # Check if coordinates are in valid limits
     if (0 <= x < screen._width) and (0 <= y < screen._height * screen._tile_num):
-        # Obtém o pixel ajustado da tela
+        # Get pixel adjusting screen position
         rgbint = screen.format.get_pixel(screen, x, y)
         return (rgbint // 256 // 256 % 256, rgbint // 256 % 256, rgbint % 256)
 
-    # Retorna preto (0, 0, 0) se estiver fora dos limites
+    # Black (0, 0, 0) if out bounds
     return (0, 0, 0)
 
-# Função para definir a cor de um pixel específico
+# Set pixel color
 def set_pixel_color(x, y, color):
     screen.pixel(x, y, color)
 
-# Função para verificar se a nova posição é válida
+# Check if is valid movement
 def is_valid_move(x, y):
     if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
         return False
     color = get_pixel_color(x, y)
-    return color != (0, 255, 255)  # A cor das paredes é 0x00ffff
+    return color != (0, 255, 255)  # Wall color is 0x00ffff
 
-# Função para verificar se o jogador alcançou o final
+# Check end of maze
 def is_end(x, y):
     color = get_pixel_color(x, y)
-    print(f"Verificando se ({x}, {y}) é o final: {color}")
-    return color == (0, 255, 0)  # A cor do final é 0x00ff00
+    # print(f"Check if ({x}, {y}) is end maze: {color}")
+    return color == (0, 255, 0)  # End Color is 0x00ff00
 
 class Maze():
+    # This class create and draw a maze
     def __init__(self, screen):
         self.screen = screen
         self.height = self.screen.height * self.screen._tile_num
@@ -370,47 +385,75 @@ class Maze():
                 self.maze[self.height-1][i] = self.__exit
                 break
 
-maze = Maze(screen)
-
-player_x, player_y = maze.get_entry()
-set_pixel_color(player_x, player_y, (255, 0, 0))
-
-
-while True:
-    time.sleep(0.1)  
-
-    # Obtém a direção do joystick
-    move_x = int (get_x(joystick_x))
-    move_y = int (get_y(joystick_y))
-
-    # Calcula a nova posição potencial do jogador
-    new_x = player_x + move_x
-    new_y = player_y + move_y
+class Game:
+    # Main Game Class
+    def __init__(self):
+        self.maze = Maze(screen)
+        self.level_count = 1
+        self.player_x, self.player_y = self.maze.get_entry()
     
-    # Verifica se a nova posição é válida
-    if is_valid_move(new_x, new_y):
-        if is_end(new_x, new_y):
-            print("Você alcançou o final do labirinto!")
-            set_pixel_color(player_x, player_y, (0, 0, 0))
+    # Sound effects
+    def moveSound(self):
+        adafruit_rtttl.play (buzzer, "move:d=4,o=5,b=880:8c6")
 
-            # Atualiza a posição do jogador
-            player_x, player_y = new_x, new_y
+    def endLevelSound(self):
+        adafruit_rtttl.play (buzzer, "endlevel:d=4,o=5,b=330:8c6,8d6")
+    
+    def display_message(self, message, color):
+        # Marquee Message
+        label = Label(text=message, font=font, scale=2)
+        bitmap = label.bitmap
+        colors = [0, 0]
+        hue = 0
+        start_time = time.time()
+        while time.time() - start_time < 2:  # Display for 2 seconds
+            for x in range(bitmap.width):
+                hue = hue + 7
+                if hue >= 256:
+                    hue = hue - 256
+                colors[1] = colorwheel(hue)
 
-            # Define a nova cor da posição do jogador
-            set_pixel_color(player_x, player_y, (255, 0, 0))
-       
+                for a in range(screen.width - 1):
+                    for y in range(screen.height):
+                        screen.pixel(a, y, screen.pixel(a + 1, y))
+
+                for y in range(screen.height):
+                    bm_y = y - 6 #offset
+                    if 0 <= bm_y < bitmap.height:
+                        color_index = bitmap[x, bm_y]
+                    else:
+                        color_index = 0
+                    screen.pixel(screen.width - 1, y, colors[color_index])
+
+                screen.display()
+                gc.collect()
+                time.sleep(0.02)
+
+    def play(self):
+        while True:
+            screen.pixel(self.player_x, self.player_y, (0, 0, 0))
+            dx = int(get_x(joystick_x))
+            dy = int(get_y(joystick_y))
+            if dx != 0 or dy != 0:
+                self.moveSound()
+                new_x = self.player_x + dx
+                new_y = self.player_y + dy
+                if is_valid_move(new_x, new_y):
+                    self.player_x = new_x
+                    self.player_y = new_y
+                    if is_end(self.player_x, self.player_y):
+                        screen.pixel(self.player_x, self.player_y, (255, 0, 0))
+                        screen.display()
+                        self.endLevelSound()
+                        self.level_count += 1
+                        # Write a Message
+                        self.display_message(f' Level {self.level_count} ', 0xff0000)
+                        self.maze.redraw()
+                        self.player_x, self.player_y = self.maze.get_entry()
+
+            screen.pixel(self.player_x, self.player_y, (255, 0, 0))
             screen.display()
-            time.sleep(2)
-            break
-        else:
-            print ('Movendo para ', new_x, new_y)
-            # Apaga a cor da posição antiga do jogador
-            set_pixel_color(player_x, player_y, (0, 0, 0))
+            time.sleep(0.1)
 
-            # Atualiza a posição do jogador
-            player_x, player_y = new_x, new_y
-
-            # Define a nova cor da posição do jogador
-            set_pixel_color(player_x, player_y, (255, 0, 0))
-       
-            screen.display()
+game = Game()
+game.play()
