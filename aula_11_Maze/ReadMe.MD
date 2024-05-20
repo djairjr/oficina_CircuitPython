@@ -1,11 +1,4 @@
 # Maze Game
-Aqui eu estou testando a possibilidade de gerar o Mapa do jogo aleatoriamente.
-Também vamos implementar a rotina de movimento a partir do Joystick.
-
-Uma opção interessante é criar um Pixel adversário, como em Pacman.
-Ou ainda, uma masmorra com tesouros e monstros.
-
-Por enquanto, o código apenas desenha o labirinto e os pontos de entrada
-e saída.
-
-https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_11_Maze/aula_11_maze.py
+Eu encontrei um gerador de labirintos praticamente pronto e foi só adaptar o código para desenhar o labirinto na tela Neopixel.
+Meu sistema detecta as colisões, os movimentos válidos do jogador e também o ponto de saída do labirinto.
+Estou trabalhando numa segunda versão, com um inimigo que persegue o jogador e o faz voltar ao ponto de inicio.
