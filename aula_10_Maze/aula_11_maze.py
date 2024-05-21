@@ -9,7 +9,7 @@
     Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 """
 
-import time
+import time, gc
 import board, random
 import neopixel_spi as neopixel
 
@@ -101,13 +101,13 @@ def is_valid_move(x, y):
     if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
         return False
     color = get_pixel_color(x, y)
-    return color != (0, 255, 255)  # A cor das paredes é 0x00ffff
+    return color != (0, 255, 255)  # Wall color is 0x00ffff
 
 # Check end of maze
 def is_end(x, y):
     color = get_pixel_color(x, y)
-    print(f"Verificando se ({x}, {y}) é o final: {color}")
-    return color == (0, 255, 0)  # A cor do final é 0x00ff00
+    # print(f"Check if ({x}, {y}) is end maze: {color}")
+    return color == (0, 255, 0)  # End Color is 0x00ff00
 
 class Maze():
     # This class create and draw a maze
@@ -426,6 +426,7 @@ class Game:
                     screen.pixel(screen.width - 1, y, colors[color_index])
 
                 screen.display()
+                gc.collect()
                 time.sleep(0.02)
 
     def play(self):
@@ -446,7 +447,7 @@ class Game:
                         self.endLevelSound()
                         self.level_count += 1
                         # Write a Message
-                        self.display_message(f'  Level {self.level_count} ', 0xff0000)
+                        self.display_message(f' Level {self.level_count} ', 0xff0000)
                         self.maze.redraw()
                         self.player_x, self.player_y = self.maze.get_entry()
 
@@ -456,6 +457,3 @@ class Game:
 
 game = Game()
 game.play()
-
-
-
