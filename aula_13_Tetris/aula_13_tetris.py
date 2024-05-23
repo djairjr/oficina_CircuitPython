@@ -1,3 +1,9 @@
+'''
+Tetris Game
+Adapted from Nick Wirites Some Code version
+Tetris in 115 lines https://github.com/nickwritessomecode/tetris_in_115_lines
+'''
+
 import board, time, random
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
@@ -21,7 +27,7 @@ trigger = DigitalInOut(board.D2)
 trigger.direction = Direction.INPUT
 trigger.pull = Pull.UP
 
-# Define Neopixel Stripe
+# Define Neopixel 
 pixels = neopixel.NeoPixel_SPI(
     spi,
     pixel_width * pixel_height * num_tiles,  # Multiplicando por num_tiles
@@ -50,39 +56,18 @@ COLORS = [
     0x8B00FF   # Violet
 ]
 
-# Check color routine. Can check collision?
-def get_pixel_color(x, y):
-    # Adjusting coordinates based on rotation
-    if screen.rotation == 1:
-        x, y = y, x
-        x = screen._width - x - 1
-    elif screen.rotation == 2:
-        x = screen._width - x - 1
-        y = screen._height * screen._tile_num - y - 1
-    elif screen.rotation == 3:
-        x, y = y, x
-        y = screen._height * screen._tile_num - y - 1
-
-    # Check if coordinates are in valid limits
-    if (0 <= x < screen._width) and (0 <= y < screen._height * screen._tile_num):
-        # Get pixel adjusting screen position
-        rgbint = screen.format.get_pixel(screen, x, y)
-        return (rgbint // 256 // 256 % 256, rgbint // 256 % 256, rgbint % 256)
-
-    # Black (0, 0, 0) if out bounds
-    return (0, 0, 0)
-
 # Routine to treat Joystick values
 def get_joystick(x_pin, y_pin):
     return int(map_range(y_pin.value, 200, 65535, -2, 2)), int(map_range(x_pin.value, 200, 65535, -2, 2))
 
 class Tetris():
+
     FIELD_HEIGHT = 32
     FIELD_WIDTH = 16
     
     SCORE_PER_ELIMINATED_LINES = (0, 40, 100, 300, 1200)
     TETROMINOS = [
-        [(0, 0), (0, 1), (1, 0), (1, 1)],  # O
+        [(0, 0), (0, 1), (1, 0), (1, 1)],  # O Square
         [(0, 0), (0, 1), (1, 1), (2, 1)],  # L
         [(0, 1), (1, 1), (2, 1), (2, 0)],  # J
         [(0, 1), (1, 0), (1, 1), (2, 0)],  # Z
@@ -130,8 +115,10 @@ class Tetris():
     
     def move(self, dr, dc):
         if self.game_over:
+            # If wasn't game over
             return
-
+        # Check cell is free
+        
         if all(self.is_cell_free(r + dr, c + dc) for (r, c) in self.get_tetromino_coords()):
             self.tetromino_offset = [self.tetromino_offset[0] + dr, self.tetromino_offset[1] + dc]
         elif dr == 1 and dc == 0:
@@ -162,6 +149,7 @@ class Tetris():
             self.tetromino, self.tetromino_offset = rotated_tetromino, wallkick_offset
 
 class Game:
+    # This class was adapted to work with Neopixel Screen
     def __init__(self):
         self.tetris = Tetris(screen)
     
@@ -172,7 +160,8 @@ class Game:
             if current_time - last_move_time > 1.0 - (self.tetris.level * 0.1):
                 self.tetris.move(1, 0)
                 last_move_time = current_time
-
+            
+            # Get Joystick Move
             dx, dy = get_joystick(joystick_x, joystick_y)
 
             if dx == -1:
@@ -182,12 +171,13 @@ class Game:
             if dy == 1:
                 self.tetris.rotate()
             if dy == -1:
+                # Fast Move Down
                 self.tetris.move(3, 0)
             if not trigger.value:
                 self.tetris.rotate()
 
             self.draw()
-            time.sleep(0.1)
+            time.sleep(0.02)
 
     def draw(self):
         screen.fill(0)
