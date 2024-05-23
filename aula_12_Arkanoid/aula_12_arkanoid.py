@@ -4,6 +4,7 @@ import random
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 import neopixel_spi as neopixel
+import adafruit_rtttl
 
 # My custom version
 from tile_framebuf import TileFramebuffer
@@ -31,6 +32,10 @@ pixels = neopixel.NeoPixel_SPI(
     auto_write=False,
 )
 
+buzzer = board.D6
+
+start_song = 'Arkanoid:d=4,o=5,b=140:8g6,16p,16g.6,2a#6,32p,8a6,8g6,8f6,8a6,2g6'
+
 screen = TileFramebuffer(
     pixels,
     pixel_width,
@@ -55,6 +60,7 @@ bar_width = 3
 bar_height = 2
 bars_spacing = 1
 bars_list = []
+bars_offset = 4
 
 # Cores do arco-íris
 rainbow_colors = [
@@ -74,11 +80,14 @@ lives = 5
 def create_bars():
     global bars_list
     bars_list = []
-    for y in range(pixel_width // (bar_height + bars_spacing)):
+    color_index = 0  # Índice inicial para a lista de cores
+    for y in range((pixel_width // (bar_height + bars_spacing))-bars_offset):
         for x in range((pixel_height * num_tiles) // (bar_width + bars_spacing)):
             bar_x = x * (bar_width + bars_spacing)
             bar_y = y * (bar_height + bars_spacing)
-            bars_list.append((bar_x, bar_y, y))  # Adiciona a linha para a cor
+            color = rainbow_colors[color_index % len(rainbow_colors)]
+            bars_list.append((bar_x, bar_y, color))
+            color_index += 1  # Incrementa o índice da cor
 
 def draw():
     screen.fill(0x000000)  # Limpa a tela
@@ -148,10 +157,10 @@ def move_paddle():
     global paddle_x
 
     # Mover a pá para a esquerda
-    if joystick_x.value < 2000:
+    if joystick_y.value < 2000:
         paddle_x = max(paddle_x - paddle_speed, 0)
     # Mover a pá para a direita
-    elif joystick_x.value > 60000:
+    elif joystick_y.value > 60000:
         paddle_x = min(paddle_x + paddle_speed, (pixel_height * num_tiles - paddle_width))
 
 def reset_ball():
@@ -162,6 +171,7 @@ def reset_ball():
     ball_y_speed = -1
 
 def reset_game():
+    adafruit_rtttl.play (buzzer, start_song)
     global score, lives, paddle_width
     score = 0
     lives = 5
@@ -174,4 +184,4 @@ reset_game()
 while lives > 0:
     update()
     draw()
-    time.sleep(0.02)
+    time.sleep(0.01)
