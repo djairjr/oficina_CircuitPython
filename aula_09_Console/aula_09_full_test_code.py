@@ -29,7 +29,9 @@ trigger = DigitalInOut (board.D2)
 trigger.direction = Direction.INPUT
 trigger.pull = Pull.UP
 
-buzzer = board.D3
+buzzer = board.D6 # ou D3
+adafruit_rtttl.play (buzzer, "delete:d=4,o=5,b=330:8c6,8d6")
+
 
 pixels = neopixel.NeoPixel_SPI(
     spi,
@@ -49,7 +51,6 @@ screen = TileFramebuffer(
 screen.fill(0)
 screen.text ('Teste', 1,4, 0xff0000)
 screen.display()
-adafruit_rtttl.play (buzzer, "delete:d=4,o=5,b=330:8c6,8d6")
 
 def get_joystick():
     x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2) )
