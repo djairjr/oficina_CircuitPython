@@ -1,3 +1,12 @@
+"""
+    Space Invaders
+    Adapted by Djair Guilherme (Nicolau dos Brinquedos) with a help from ChatGPT
+    For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
+    SESC Workshop - São Paulo - Brazil - May 2024
+    Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
+    Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
+"""
+
 import board
 import time
 import random
@@ -65,20 +74,24 @@ def xevious_sound():
 def galaga_sound():
     adafruit_rtttl.play (buzzer, "Galaga:d=4,o=5,b=125:8g4,32c,32p,8d,32f,32p,8e,32c,32p,8d,32a,32p,8g,32c,32p,8d,32f,32p,8e,32c,32p,8g,32b,32p,8c6,32a#,32p,8g#,32g,32p,8f,32d#,32p,8d,32a#4,32p,8a#,32c6,32p,8a#,32g,32p,16a,16f,16d,16g,16e,16d")
 
-# Routine to treat Joystick values
-def get_joystick(x_pin, y_pin):
-    return int(map_range(y_pin.value, 200, 65535, -2, 2)), int(map_range(x_pin.value, 200, 65535, -2, 2))
+def get_joystick():
+    # Returns -1 0 or 1 depending on joystick position
+    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    return x_coord, y_coord
 
 class Invader:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.width =2
+        self.height = 2
         self.color = random.choice(COLORS[1:])  # Choose a random color from the list, excluding black
 
     def draw(self):
         # Draw a 2x2 invader
-        for i in range(2):
-            for j in range(2):
+        for i in range(self.width):
+            for j in range(self.height):
                 screen.pixel(self.x + i, self.y + j, self.color)
 
     def move(self, dx, dy):
@@ -92,8 +105,8 @@ class Invader:
 
 class PlayerShip:
     def __init__(self):
-        self.x = 7  # My screen is rotated half height
-        self.y = 31  # width - 1
+        self.x = 7  # Screen Height // 2 - 1
+        self.y = 31  # Screen Width - 1
 
     def draw(self):
         # Draw the player ship using Neopixels
@@ -106,9 +119,8 @@ class PlayerShip:
         self.x += dx
 
         # Check if player ship is within the screen boundaries
-        # My screen is rotated, check if this is correct
-        if self.x < 0 or self.x >= pixel_height * num_tiles  - 3:
-            self.x = max(0, min(pixel_height * num_tiles  - 3, self.x))
+        if self.x < 0 or self.x >= pixel_height * num_tiles  - 3: # Ship is 3 pixels wide
+            self.x = max(0, min(pixel_height * num_tiles  - 3, self.x)) # Ship is 3 pixels wide
 
 
 class Projectile:
@@ -134,7 +146,7 @@ class Game:
         self.projectiles = []
         self.score = 0
         self.level = 1
-        self.invader_move_direction = 1
+        self.invader_move_direction = 1 # Down is positive. 
         self.invader_speed = 0.1
         self.game_over = False
         # Create this to reverse Enemy Ship
@@ -179,7 +191,7 @@ class Game:
     def update(self, dt):
         # Player ship movement
         dx, dy = get_joystick(joystick_x, joystick_y)
-        self.player_ship.move(dx)
+        self.player_ship.move(dx) # only x is needed.
 
         # Fire projectile
         if not trigger.value:

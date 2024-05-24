@@ -1,7 +1,12 @@
-'''
-This game is fully made with the help of Chat GPT 4.0 Ai.
-Very clever! 
-'''
+"""
+    Enduro Racer
+    Adapted by Djair Guilherme (Nicolau dos Brinquedos) with a help from ChatGPT
+    For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
+    SESC Workshop - São Paulo - Brazil - May 2024
+    Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
+    Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
+"""
+
 import board, time, random
 
 # Reading and treating Analog Input
@@ -156,6 +161,7 @@ def update():
         create_opponent_car()
 
 def move_player():
+    # Another way to threat joystick
     global player_x
 
     # Move left
@@ -166,6 +172,7 @@ def move_player():
         player_x = min(player_x + player_speed, (pixel_height * num_tiles - car_width))
 
 def check_collision(x1, y1, x2, y2):
+    # Based on cars coordinates, not color
     return not (x1 > x2 + car_width or x1 + car_width < x2 or y1 > y2 + car_height or y1 + car_height < y2)
 
 def reset_game():

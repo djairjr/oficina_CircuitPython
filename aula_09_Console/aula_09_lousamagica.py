@@ -37,14 +37,13 @@ pixels = neopixel.NeoPixel_SPI(
     auto_write=False,
 )
 
-def playTetrisSongMain():
-    adafruit_rtttl.play (buzzer, "MainTitle:d=4,o=5,b=200:e6,8b,8c6,8d6,16e6,16d6,8c6,8b,a,8a,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,2a,8p,d6,8f6,a6,8g6,8f6,e6,8e6,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,a")
-
-def playTetrisSongOne():
-    adafruit_rtttl.play (buzzer, "Tetris:d=4,o=5,b=220:d6,32p,c.6,32p,8a,8c6,8a#,16a,16g,f,c,8a,8c6,8g,8a,f,c,d,8d,8e,8g,8f,8e,8d,c,c,c")
-
-def gameOverSong():
-    adafruit_rtttl.play (buzzer, "GameOver:d=4,o=5,b=120:d#6,b,c#6,a#,16b,16g#,16a#,16b,16b,16g#,16a#,16b,c#6,g,d#6,16p,16g#,16a#,16b,c#6,16p,16b,16a#,g#,g,g#,16f,16g,16g#,16a#,8d#.6,32d#6,32p,32d#6,32p,32d#6,32p,16d6,16d#6,8f.6,16d6,8a#,8p,8f#6,8d#6,8f#,8g#,a#.,16p,16a#,8d#.6,16f6,16f#6,16f6,16d#6,16a#,8g#.,16b,8d#6,16f6,16d#6,8a#.,16b,16a#,16g#,16f,16f#,d#")
+screen = TileFramebuffer(
+    pixels,
+    pixel_width,
+    pixel_height,
+    num_tiles,
+    rotation = 0
+)
 
 def moveSound():
     adafruit_rtttl.play (buzzer, "move:d=4,o=5,b=880:8c6")
@@ -52,35 +51,30 @@ def moveSound():
 def deleteSound():
     adafruit_rtttl.play (buzzer, "delete:d=4,o=5,b=330:8c6,8d6")
 
-pixel_framebuf = TileFramebuffer(
-    pixels,
-    pixel_width,
-    pixel_height,
-    num_tiles,
-    rotation = 3
-)
 
-def get_x(pin, number):
-    return map_range (pin.value, 200, 65535, - number //2 , number // 2) 
+def get_joystick():
+    # Returns -1 0 or 1 depending on joystick position
+    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    return x_coord, y_coord
 
-def get_y(pin, number):
-    return map_range (pin.value, 65535, 200, - number //2 , number // 2) 
-
+# Center Screen
 old_x = pixel_width //2
 old_y = pixel_height * num_tiles // 2
 x_pos, y_pos = old_x, old_y
 
 while True:
     if (not trigger.value):
-        pixel_framebuf.fill (0x000000)
+        screen.fill (0x000000)
         deleteSound()
     else:
-        x_pos = old_x + int (get_x (joystick_x, pixel_width //4))
-        y_pos = old_y + int (get_y (joystick_y, pixel_height // 2))
+        x,y = get_joystick()
+        x_pos = old_x + x
+        y_pos = old_y + y
         if x_pos != old_x or y_pos != old_y:
             moveSound()
-        pixel_framebuf.line (old_y, old_x, y_pos, x_pos, colorwheel((time.monotonic()*50)%255))
-        pixel_framebuf.display()
+        screen.line (old_y, old_x, y_pos, x_pos, colorwheel((time.monotonic()*50)%255))
+        screen.display()
         time.sleep(0.1)
         old_x = x_pos
         old_y = y_pos

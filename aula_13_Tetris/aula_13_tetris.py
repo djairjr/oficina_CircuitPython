@@ -1,7 +1,12 @@
 '''
-Tetris Game
-Adapted from Nick Wirites Some Code version
-Tetris in 115 lines https://github.com/nickwritessomecode/tetris_in_115_lines
+    Tetris Game
+
+    Tetris in 115 lines https://github.com/nickwritessomecode/tetris_in_115_lines
+    Adapted from Nick Wirites Some Code by Djair Guilherme (Nicolau dos Brinquedos)
+    For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
+    SESC Workshop - São Paulo - Brazil - May 2024
+    Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
+    Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 '''
 
 import board, time, random
@@ -30,7 +35,7 @@ trigger.pull = Pull.UP
 # Define Neopixel 
 pixels = neopixel.NeoPixel_SPI(
     spi,
-    pixel_width * pixel_height * num_tiles,  # Multiplicando por num_tiles
+    pixel_width * pixel_height * num_tiles,  
     brightness=0.1,
     auto_write=False,
 )
@@ -56,14 +61,16 @@ COLORS = [
     0x8B00FF   # Violet
 ]
 
-# Routine to treat Joystick values
-def get_joystick(x_pin, y_pin):
-    return int(map_range(y_pin.value, 200, 65535, -2, 2)), int(map_range(x_pin.value, 200, 65535, -2, 2))
+def get_joystick():
+    # Returns -1 0 or 1 depending on joystick position
+    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    return x_coord, y_coord
 
 class Tetris():
 
-    FIELD_HEIGHT = 32
-    FIELD_WIDTH = 16
+    FIELD_HEIGHT = 32 # screen._width
+    FIELD_WIDTH = 16 # screen._height
     
     SCORE_PER_ELIMINATED_LINES = (0, 40, 100, 300, 1200)
     TETROMINOS = [
@@ -108,6 +115,7 @@ class Tetris():
         self.reset_tetromino()
 
     def get_color(self, r, c):
+        # Same color detection routine....
         return self.tetromino_color if (r, c) in self.get_tetromino_coords() else self.field[r][c]
     
     def is_cell_free(self, r, c):

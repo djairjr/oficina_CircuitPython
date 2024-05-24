@@ -1,8 +1,13 @@
 '''
-Várias rotinas auxiliares para jogos
+    Common Header and Auxiliary Functions for all Games
+    Wroted by Djair Guilherme (Nicolau dos Brinquedos)
+    For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
+    SESC Workshop - São Paulo - Brazil - May 2024
+    Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
+    Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 '''
 
-# GC is a memory manager
+# GC is a memory manager - Sometimes framebuffer get full
 import gc
 import board, random, time
 import neopixel_spi as neopixel

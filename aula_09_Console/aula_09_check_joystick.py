@@ -1,6 +1,11 @@
 '''
-Tratando o Joystick
-Checando a gama de valores que os dois eixos do joystick retornam
+    Checking Joystick Range Values
+    
+    Wroted by Djair Guilherme (Nicolau dos Brinquedos)
+    For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
+    SESC Workshop - São Paulo - Brazil - May 2024
+    Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
+    Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 '''
 
 import board, time, os
@@ -15,17 +20,16 @@ trigger = DigitalInOut (board.D2)
 trigger.direction = Direction.INPUT
 trigger.pull = Pull.UP
 
-# Aqui eu escrevi duas rotinas auxiliares que não vamos usar a princípio
-
-def get_x(pin, number):
-    return map_range (pin.value, 200, 65535, - number //2 , number // 2) 
-
-def get_y(pin, number):
-    return map_range (pin.value, 65535, 200, - number //2 , number // 2)
+def get_joystick():
+    # Returns -1 0 or 1 depending on joystick position
+    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    return x_coord, y_coord
 
 while True:
     # Eixo x - cima baixo
     # Eixo y - esquerda direita
-    print (joystick_x.value) 
+    print (joystick_x.value, joystick_y.value)
+    print (get_joystick())
     time.sleep(0.05)
     

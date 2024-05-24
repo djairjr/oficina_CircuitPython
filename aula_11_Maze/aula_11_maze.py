@@ -65,14 +65,14 @@ screen = TileFramebuffer(
 # Load Bitmap Font
 font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
 
-def get_x(pin):
-    return map_range (pin.value, 200, 65535, - 2 , 2) 
-
-def get_y(pin):
-    return map_range (pin.value, 200, 65535, - 2 , 2)
+def get_joystick():
+    # Returns -1 0 or 1 depending on joystick position
+    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    return x_coord, y_coord
 
 def get_pixel_color(x, y):
-    # Adjusting coordinates based on rotation
+    # Get Pixel color. Deal with screen rotation, because width and height changes...
     if screen.rotation == 1:
         x, y = y, x
         x = screen._width - x - 1
@@ -92,22 +92,19 @@ def get_pixel_color(x, y):
     # Black (0, 0, 0) if out bounds
     return (0, 0, 0)
 
-# Set pixel color
-def set_pixel_color(x, y, color):
-    screen.pixel(x, y, color)
-
-# Check if is valid movement
-def is_valid_move(x, y):
+def check_wall(x, y, wall_color):
+    # Check Screen Limits First
     if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
         return False
+    # Then check color
     color = get_pixel_color(x, y)
-    return color != (0, 255, 255)  # Wall color is 0x00ffff
+    return color != wall_color
 
-# Check end of maze
-def is_end(x, y):
+def check_color(x, y, colorcheck):
+    # Only check a color
     color = get_pixel_color(x, y)
-    # print(f"Check if ({x}, {y}) is end maze: {color}")
-    return color == (0, 255, 0)  # End Color is 0x00ff00
+    return color == colorcheck
+
 
 class Maze():
     # This class create and draw a maze
@@ -432,16 +429,23 @@ class Game:
     def play(self):
         while True:
             screen.pixel(self.player_x, self.player_y, (0, 0, 0))
-            dx = int(get_x(joystick_x))
-            dy = int(get_y(joystick_y))
+            dx, dy = get_joystick()
+
             if dx != 0 or dy != 0:
+                # If joystick move...
                 self.moveSound()
+                
+                # Increase or decrease player position
                 new_x = self.player_x + dx
                 new_y = self.player_y + dy
-                if is_valid_move(new_x, new_y):
+                
+                # Check if is there a wall
+                if check_wall(new_x, new_y, 0x00FFFF):
                     self.player_x = new_x
                     self.player_y = new_y
-                    if is_end(self.player_x, self.player_y):
+                    
+                    # Check if is end of maze (Green Color)
+                    if check_color(self.player_x, self.player_y, 0x00ff00):
                         screen.pixel(self.player_x, self.player_y, (255, 0, 0))
                         screen.display()
                         self.endLevelSound()

@@ -1,14 +1,20 @@
-# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams, written for Adafruit Industries
-# SPDX-License-Identifier: MIT
-"""
-This example runs on an Seeed Xiao RP2040
-"""
+'''
+    Moving rectangle Example. Testing Joystick and Draw functions
+    Wroted by Djair Guilherme (Nicolau dos Brinquedos)
+    For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
+    SESC Workshop - São Paulo - Brazil - May 2024
+    Requirements: custom tilegrid, tile_framebuf, my_framebuf libraries
+    Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
+'''
+
 import board, time, os
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
 
 import neopixel_spi as neopixel
+
+# This is the original version of library, not used..
 from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 from rainbowio import colorwheel
@@ -38,16 +44,8 @@ pixels = neopixel.NeoPixel_SPI(
     auto_write=False,
 )
 
-"""
-pixels = neopixel.NeoPixel(
-    pixel_pin,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
-    brightness=0.1,
-    auto_write=False,
-)
-"""
 
-pixel_framebuf = TileFramebuffer(
+screen = TileFramebuffer(
     pixels,
     pixel_width,
     pixel_height,
@@ -55,11 +53,11 @@ pixel_framebuf = TileFramebuffer(
     rotation = 3
 )
 
-def get_x(pin, number):
-    return map_range (pin.value, 200, 65535, - number //2 , number // 2) 
-
-def get_y(pin, number):
-    return map_range (pin.value, 65535, 200, - number //2 , number // 2)
+def get_joystick():
+    # Returns -1 0 or 1 depending on joystick position
+    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    return x_coord, y_coord
 
 
 old_x = pixel_width //2
@@ -67,15 +65,19 @@ old_y = pixel_height * num_tiles // 2
 
 while True:
     if (not trigger.value):
-        pixel_framebuf.fill (0x000000)
+        screen.fill (0x000000)
     else:
-        x_pos = old_x + int (get_x (joystick_x, pixel_width //4))
-        y_pos = old_y + int (get_y (joystick_y, pixel_height // 2))
-        pixel_framebuf.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255))
-        pixel_framebuf.display()
+        new_x, new_y = get_joystick()
+        x_pos = old_x + new_x
+        y_pos = old_y + new_y
+        
+        # Draw rect
+        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255))
+        screen.display()
         
         if ((x_pos != old_x) or (y_pos != old_y)):
-            pixel_framebuf.fill (0x000000)
+            # If moves, clear screen first
+            screen.fill (0x000000)
 
         old_x = x_pos
         old_y = y_pos
