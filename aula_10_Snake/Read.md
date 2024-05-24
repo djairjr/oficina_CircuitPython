@@ -1,6 +1,12 @@
-#Snake Game ou Nibbles
-Jogo muito simples de ser programado e que diverte por horas.
-Vamos trabalhar com a detecção dos limites da tela, do corpo da serpente e também 
-com a fruta. Cada vez que a serpente passa por cima da fruta, aumenta de tamanho.
+#Snake Game
 
-É possível criar desafios, como obstáculos, paredes e mais frutas.
+![Snake Game no Console]([http://url/to/img.png](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_10_Snake/Snake.png))
+
+Snake é o primeiro dos jogos em que vamos criar objetos diferentes, com comportamentos diferentes.
+A serpente possui a cabeça, que é comandada pelo joystick. Mas o corpo da serpente apenas segue a 
+cabeça e vai aumentando de tamanho à medida em que a serpente come a fruta.
+
+O sistema de colisões precisa detectar os limites da tela e também a circunstância em que a cabeça
+da serpente toca algum ponto do corpo da serpente.
+
+Além disso, precisa detectar a fruta e aumentar o tamanho do corpo.
