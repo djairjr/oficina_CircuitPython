@@ -8,3 +8,5 @@ Uma possibilidade interessante seria criar um adversário, que persegue o jogado
 ou que tenta sair primeiro do labirinto.
 
 A pontuação pode ser dada por pontos. Ou por contagem regressiva.
+
+![Maze Game](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_11_Maze/Maze.png)
