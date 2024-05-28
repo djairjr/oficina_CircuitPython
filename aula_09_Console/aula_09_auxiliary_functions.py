@@ -17,16 +17,14 @@ from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
 
-# My custom version of Library
+# My custom version of Library, using two 8 x 32 pannels
 from tile_framebuf import TileFramebuffer
-spi = board.SPI()
 
-# Setting up the Neopixel Panel
-pixel_pin = board.D10
-pixel_width = 32
-pixel_height = 8
-num_tiles = 2
-num_pixels = pixel_width * pixel_height * num_tiles
+# This is the original version of library when using 16x16 Panels
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
+
+spi = board.SPI()
+pixel_pin = board.D10 #board.MOSI
 
 # Prepare Joystick in Analog Pins
 joystick_x = AnalogIn(board.A0)
@@ -40,20 +38,45 @@ trigger.pull = Pull.UP
 # Setup Buzzer. Can be any digital Pin
 buzzer = board.D3
 
+'''
+# Setting up the Neopixel Pannel - 8 x 32 Version
+pixel_width = 32
+pixel_height = 8
+num_tiles = 2 
+num_pixels = pixel_width * pixel_height * num_tiles
+'''
+
+# Setting up the Neopixel Pannel - 16 x 16 Version
+pixel_width = 32 
+pixel_height = 16
+num_pixels = pixel_width * pixel_height
+
 pixels = neopixel.NeoPixel_SPI(
     spi,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
+    num_pixels, # dont forget to multiply for num_tiles
     brightness=0.2,
     auto_write=False,
 )
 
-# Prepare PixelFramebuffer Screen
+'''
+# Prepare PixelFramebuffer Screen 8 x 32 Version
 screen = TileFramebuffer(
     pixels,
     pixel_width,
     pixel_height,
     num_tiles,
     rotation = 1 # 0 Default. 
+)
+'''
+
+# When 16x16 Using original Adafruit_Pixel_Framebuf Library
+screen = PixelFramebuffer(
+    pixels,
+    pixel_width,
+    pixel_height,
+    rotation = 3,
+    reverse_x=True,
+    orientation=VERTICAL,
 )
 
 def get_joystick():
