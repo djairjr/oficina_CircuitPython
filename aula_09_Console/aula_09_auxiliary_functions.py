@@ -8,9 +8,11 @@
 '''
 
 # GC is a memory manager - Sometimes framebuffer get full
-import gc
-import board, random, time
+import board, random, time, gc
 import neopixel_spi as neopixel
+
+# Using HT16K33 as Score and Message Display
+from adafruit_ht16k33 import segments
 
 # Treating Joystick
 from analogio import AnalogIn
@@ -18,10 +20,14 @@ from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
 
 # My custom version of Library, using two 8 x 32 pannels
-from tile_framebuf import TileFramebuffer
+'''from tile_framebuf import TileFramebuffer'''
 
 # This is the original version of library when using 16x16 Panels
 from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
+
+# This is HT16K33 Four Digits 14 Segment Display
+display = segments.Seg14x4(board.I2C())
+display.marquee("Game Start    ", loop=False)
 
 spi = board.SPI()
 pixel_pin = board.D10 #board.MOSI
@@ -86,24 +92,13 @@ def get_joystick():
     return x_coord, y_coord
 
 def get_pixel_color(x, y):
-    # Get Pixel color. Deal with screen rotation, because width and height changes...
-    if screen.rotation == 1:
-        x, y = y, x
-        x = screen._width - x - 1
-    elif screen.rotation == 2:
-        x = screen._width - x - 1
-        y = screen._height * screen._tile_num - y - 1
-    elif screen.rotation == 3:
-        x, y = y, x
-        y = screen._height * screen._tile_num - y - 1
+    # Check if coordinates are within valid limits
+    if (0 <= x < screen.width) and (0 <= y < screen.height):
+        # Get pixel color
+        rgbint = screen.pixel(x, y)
+        return (rgbint >> 16 & 0xFF, rgbint >> 8 & 0xFF, rgbint & 0xFF)
 
-    # Check if coordinates are in valid limits
-    if (0 <= x < screen._width) and (0 <= y < screen._height * screen._tile_num):
-        # Get pixel adjusting screen position
-        rgbint = screen.format.get_pixel(screen, x, y)
-        return (rgbint // 256 // 256 % 256, rgbint // 256 % 256, rgbint % 256)
-
-    # Black (0, 0, 0) if out bounds
+    # Return black (0, 0, 0) if out of bounds
     return (0, 0, 0)
 
 def check_wall(x, y, wall_color):
@@ -115,9 +110,9 @@ def check_wall(x, y, wall_color):
     return color != wall_color
 
 def check_color(x, y, colorcheck):
-    # Only check a color
+    colorcheck_rgb = ((colorcheck >> 16) & 0xFF, (colorcheck >> 8) & 0xFF, colorcheck & 0xFF)
     color = get_pixel_color(x, y)
-    return color == colorcheck
+    return color == colorcheck_rgb
 
 class Countdown ():
     """ Countdown Class """

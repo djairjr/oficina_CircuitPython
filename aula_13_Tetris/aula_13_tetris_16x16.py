@@ -1,31 +1,32 @@
 '''
-    Tetris using Two 16x16 Neopixel Panels
-    Tetris in 115 lines https://github.com/nickwritessomecode/tetris_in_115_lines
-    Adapted from Nick Wirites Some Code by Djair Guilherme (Nicolau dos Brinquedos)
+    Moving rectangle Example. Testing Joystick and Draw functions
+    Wroted by Djair Guilherme (Nicolau dos Brinquedos)
     For the "Recriating Arcade Games in Circuitpython, Neopixel and Seeed Xiao RP2040"
     SESC Workshop - São Paulo - Brazil - May 2024
-    Requirements: Adafruit_Pixel_Framebuf, Simpleio, Neopixel_SPI
+    Requirements: Adafruit_Pixel_Framebuf, Simpleio
     Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 '''
 
-import board, time, random, os
+import board, time, random, os, gc
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
 
 import neopixel_spi as neopixel
-import adafruit_rtttl
 
-# This is the original version of library using 16x16 Panels
+# This is the original version of library
 from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 from rainbowio import colorwheel
 import framebufferio
 
+# Using HT16K33 as Score and Message Display
+from adafruit_ht16k33 import segments
+
 spi = board.SPI()
 
 pixel_pin = board.D10 
-pixel_width = 32 # Two Panels 16 x 16
+pixel_width = 32
 pixel_height = 16
 
 joystick_x = AnalogIn(board.A0)
@@ -42,7 +43,6 @@ pixels = neopixel.NeoPixel_SPI(
     auto_write=False,
 )
 
-# Using original Adafruit_Pixel_Framebuf Library
 screen = PixelFramebuffer(
     pixels,
     pixel_width,
@@ -51,6 +51,12 @@ screen = PixelFramebuffer(
     reverse_x=True,
     orientation=VERTICAL,
 )
+
+screen.fill(0)
+
+# This is HT16K33 Four Digits 14 Segment Display
+display = segments.Seg14x4(board.I2C())
+display.marquee("Tetris    ", loop=False)
 
 # Creating colors
 COLORS = [
@@ -75,7 +81,9 @@ class Tetris():
     FIELD_HEIGHT = 32 # screen._width
     FIELD_WIDTH = 16 # screen._height
     
-    SCORE_PER_ELIMINATED_LINES = (0, 40, 100, 300, 1200)
+    SCORE_PER_ELIMINATED_LINES = (0, 40, 80, 120, 600)
+    SCORE_PER_FIXED_PIECE = 5  # Add 5 points when a piece is fixed
+    
     TETROMINOS = [
         [(0, 0), (0, 1), (1, 0), (1, 1)],  # O Square
         [(0, 0), (0, 1), (1, 1), (2, 1)],  # L
@@ -114,6 +122,8 @@ class Tetris():
         self.total_lines_eliminated += lines_eliminated
         self.field = [[0] * Tetris.FIELD_WIDTH for x in range(lines_eliminated)] + new_field
         self.score += Tetris.SCORE_PER_ELIMINATED_LINES[lines_eliminated] * (self.level + 1)
+        self.score += Tetris.SCORE_PER_FIXED_PIECE  # Add 5 points when a piece is fixed
+        
         self.level = self.total_lines_eliminated // 10
         self.reset_tetromino()
 
@@ -125,6 +135,7 @@ class Tetris():
         return r < Tetris.FIELD_HEIGHT and 0 <= c < Tetris.FIELD_WIDTH and (r < 0 or self.field[r][c] == 0)
     
     def move(self, dr, dc):
+        gc.collect()
         if self.game_over:
             # If wasn't game over
             return
@@ -163,6 +174,8 @@ class Game:
     # This class was adapted to work with Neopixel Screen
     def __init__(self):
         self.tetris = Tetris(screen)
+        self.scoreFormat = '{0:04}'.format (self.tetris.score)
+        display.print (self.scoreFormat)
     
     def play(self):
         last_move_time = time.monotonic()
@@ -188,10 +201,14 @@ class Game:
                 self.tetris.rotate()
 
             self.draw()
+            
             time.sleep(0.02)
 
     def draw(self):
+        gc.collect() # Or else, get memory issues
         screen.fill(0)
+        self.scoreFormat = '{0:04}'.format (self.tetris.score)
+        display.print (self.scoreFormat)
         for r in range(Tetris.FIELD_HEIGHT):
             for c in range(Tetris.FIELD_WIDTH):
                 color_num = self.tetris.get_color(r, c)
