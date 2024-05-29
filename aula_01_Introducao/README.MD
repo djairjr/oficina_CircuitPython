@@ -46,10 +46,14 @@ pip install circup
 
 
 # Listar todos os módulos disponíveis
+```
 help ('modules')
+```
 
 # Importar o Módulo 'builtins' que contém todas as palavras chave de Python
+```
 import builtins
+```
 
 # Mostrar uma lista com todas as palavras chave
 
