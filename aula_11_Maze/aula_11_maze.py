@@ -65,34 +65,53 @@ screen = TileFramebuffer(
 # Load Bitmap Font
 font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
 
-def get_joystick():
-    # Returns -1 0 or 1 depending on joystick position
-    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
-    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
-    return x_coord, y_coord
+def get_direction():
+    # This function is a little bit different than usual joystick function
+    x = int(map_range(joystick_x.value, 200, 65535, -1.5, 1.5)) # X up down
+    y = int(map_range(joystick_y.value, 200, 65535,  -1.5, 1.5)) # Y Left Right
+    if abs(x) > abs(y):
+        return (x, 0)  # Horizontal Move
+    else:
+        return (0, y)  # Vertical Move
+
 
 def get_pixel_color(x, y):
-    # Check if coordinates are within valid limits
-    if (0 <= x < screen.width) and (0 <= y < screen.height):
-        # Get pixel color
-        rgbint = screen.pixel(x, y)
-        return (rgbint >> 16 & 0xFF, rgbint >> 8 & 0xFF, rgbint & 0xFF)
+    # Adjusting coordinates based on rotation
+    if screen.rotation == 1:
+        x, y = y, x
+        x = screen._width - x - 1
+    elif screen.rotation == 2:
+        x = screen._width - x - 1
+        y = screen._height * screen._tile_num - y - 1
+    elif screen.rotation == 3:
+        x, y = y, x
+        y = screen._height * screen._tile_num - y - 1
 
-    # Return black (0, 0, 0) if out of bounds
+    # Check if coordinates are in valid limits
+    if (0 <= x < screen._width) and (0 <= y < screen._height * screen._tile_num):
+        # Get pixel adjusting screen position
+        rgbint = screen.format.get_pixel(screen, x, y)
+        return (rgbint // 256 // 256 % 256, rgbint // 256 % 256, rgbint % 256)
+
+    # Black (0, 0, 0) if out bounds
     return (0, 0, 0)
 
-def check_wall(x, y, wall_color):
-    # Check Screen Limits First
+# Set pixel color
+def set_pixel_color(x, y, color):
+    screen.pixel(x, y, color)
+
+# Check if is valid movement
+def is_valid_move(x, y):
     if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
         return False
-    # Then check color
     color = get_pixel_color(x, y)
-    return color != wall_color
+    return color != (0, 255, 255)  # Wall color is 0x00ffff
 
-def check_color(x, y, colorcheck):
-    colorcheck_rgb = ((colorcheck >> 16) & 0xFF, (colorcheck >> 8) & 0xFF, colorcheck & 0xFF)
+# Check end of maze
+def is_end(x, y):
     color = get_pixel_color(x, y)
-    return color == colorcheck_rgb
+    # print(f"Check if ({x}, {y}) is end maze: {color}")
+    return color == (0, 255, 0)  # End Color is 0x00ff00
 
 class Maze():
     # This class create and draw a maze
@@ -417,23 +436,15 @@ class Game:
     def play(self):
         while True:
             screen.pixel(self.player_x, self.player_y, (0, 0, 0))
-            dx, dy = get_joystick()
-
+            dx, dy = get_direction()
             if dx != 0 or dy != 0:
-                # If joystick move...
                 self.moveSound()
-                
-                # Increase or decrease player position
-                new_x = self.player_x + dx
-                new_y = self.player_y + dy
-                
-                # Check if is there a wall
-                if check_wall(new_x, new_y, 0x00FFFF):
+                new_x = self.player_x - dx
+                new_y = self.player_y - dy
+                if is_valid_move(new_x, new_y):
                     self.player_x = new_x
                     self.player_y = new_y
-                    
-                    # Check if is end of maze (Green Color)
-                    if check_color(self.player_x, self.player_y, 0x00ff00):
+                    if is_end(self.player_x, self.player_y):
                         screen.pixel(self.player_x, self.player_y, (255, 0, 0))
                         screen.display()
                         self.endLevelSound()
