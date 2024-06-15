@@ -12,6 +12,7 @@
 import time, gc, asyncio
 import board, random
 import adafruit_rtttl
+from hardware import Hardware
 
 class Maze():
     # This class create and draw a maze
@@ -85,6 +86,7 @@ class Maze():
             print (position, line)
             position+=1
         '''
+        gc.collect()
         self.hardware.screen.display()
 
     # Find number of surrounding cells
@@ -112,6 +114,7 @@ class Maze():
         # Randomize starting point and set it a cell
         starting_height = int(random.random()*self.height)
         starting_width = int(random.random()*self.width)
+        
         if (starting_height == 0):
             starting_height += 1
         if (starting_height == self.height-1):
@@ -358,13 +361,14 @@ class MazeGame:
         while True:
             gc.collect()
             self.hardware.screen.pixel(self.player_x, self.player_y, (0, 0, 0))
+            
             dx, dy = self.hardware.get_direction()
 
             if dx != 0 or dy != 0:
                 
                 # Increase or decrease player position
-                self.new_x = self.player_x + dx
-                self.new_y = self.player_y - dy
+                self.new_x = self.player_x + dy
+                self.new_y = self.player_y - dx
                 print (self.new_x, self.new_y)
                 
                 if self.hardware.check_wall(self.new_x, self.new_y, (0,255,255)):
@@ -402,3 +406,9 @@ class MazeGame:
         gc.collect()
         self.hardware.display.marquee("Maze Game    ", loop=False)
         asyncio.run(self.run_game())
+
+hardware = Hardware(panel_16x16 = False)
+print (hardware)
+
+maze = MazeGame(hardware)
+maze.play()
