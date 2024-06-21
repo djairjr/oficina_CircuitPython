@@ -3,21 +3,18 @@
 # Esquema de montagem para o nosso Console Arcade
 ![Esquema de Montagem](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_09_Console/images/Xiao_Neopixel_bb.png)
 
-O sistema do nosso console vai ser o mesmo para todos os nossos jogos.
-Na aula de hoje, vamos montar todo o sistema e testar cada um dos módulos isoladamente.
+O console para os jogos é feito a partir de uma Raspberry Pi Pico, ou ESP32S2 ou S3.
+Para o joystick, usamos um módulo simples de Thumbstick analógico.
 
-Em seguida, vamos estabelecer relações entre eles e verificar como funcionam juntos.
-No final da aula, vamos montar um Etch a Sketch (Lousa Mágica) para testar tudo junto.
+O botão de disparo é o do próprio joystick, mas você pode ligar um segundo botão em
+paralelo.
 
-Para exibir as mensagens de jogo, placar e contagem regressiva, vamos utilizar um display I2C
-com 14 Segmentos e 4 Caracteres, que utiliza o chip HT16K33.
+Os efeitos sonoros são através de um buzzer.
+Um display HT16k33 com 14 Segmentos e 4 Dígitos exibe o placar e mensagens de status.
 
-A conexão para esse módulo é um pouco confusa...
+A tela do console é feita com Matrizes de Neopixel. O sistema foi testado com dois tipos
+de painéis: 8x32 ou 16x16, compondo com eles uma tela de 16x32.
 
-VI2C é igual à tensão do barramento I2C utilizado. No nosso caso, 3.3 V
-VCC é sempre 5V (quando ligamos VCC em 3V3 no RP2040, o display não é reconhecido).
-GND é Terra.
-SCL e SDA são os pinos de I2C Padrão.
+Os arquivos desta pasta são os exercícios da primeira aula do curso.
 
-Para utilizarmos o módulo, precisamos instalar a biblioteca adafruit_ht16k33
 

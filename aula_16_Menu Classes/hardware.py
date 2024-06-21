@@ -1,9 +1,19 @@
 '''
-    Classe para gerenciamento de todo o hardware.
-    O default é usar dois painéis de 16x16 e a biblioteca padrão.
-    O sistema está preparado para identificar a placa usada
-    e ajustar as pinagens de acordo.
-    Ainda devo testar na Franzinho Wifi e nas Xiao ESP32 da Seeed
+    Hardware - 20/06/2024 - Nicolau dos Brinquedos
+    Inicializa todo o Hardware do Console.
+    Pode ser chamado isoladamente por cada jogo, conforme
+    indicado no final de cada código.
+    
+    Na versão final, vai ser chamado somente pelo code.py
+    que é um sistema de menus com todos os jogos.
+    
+    Aceita como parâmetro o tipo de painel de led:
+    panel_16x16 = True # default
+    Se for False, assume que é 32x8
+    
+    O sistema tá todo baseado na idéia de uma tela 16x32,
+    não importa o modo como foi montada. Não foi testado
+    em outros cenários...
 '''
 
 import time, asyncio,supervisor, os
@@ -30,17 +40,17 @@ class Hardware():
                 
         self.triggerSPI = triggerSPI
         
-        if self.board_family == 'rp2040': # Is RP2040 Hardware?
+        if self.board_family == 'rp2040': # Xiao or Pico only
             
-            if 'XIAO' in self.board_type: # Is XIAO
+            if 'XIAO' in self.board_type:
                 self.pin_0 = board.A0
                 self.pin_1 = board.A1
                 self.pin_2 = board.D2
                 self.pin_3 = board.D3
                 self.pin_6 = board.D10
                 self.pin_7 = board.D6 # Reset
-            else:
-                self.pin_0 = board.GP0 # Supposed to be a Pico
+            else: # Pico
+                self.pin_0 = board.GP0
                 self.pin_1 = board.GP1
                 self.pin_2 = board.GP2
                 self.pin_3 = board.GP3
@@ -72,9 +82,9 @@ class Hardware():
                     else:
                         # This maybe not work. Is for boards that is not Xiao or Pico. Improve later
                         self.spi = busio.SPI(board.SCK, MOSI=board.MOSI)
-        else:            
+        else: # ESP32 - could be any Xiao too...           
             if 'XIAO' in self.board_type:
-                # Any XIAO ESP32 has same pin names.
+                # Any XIAO ESP32
                 self.pin_0 = board.A0
                 self.pin_1 = board.A1
                 self.pin_2 = board.D2
@@ -91,6 +101,7 @@ class Hardware():
                 self.pin_5 = board.IO9 	#SCL
                 self.pin_6 = board.IO18  #NEOPIXEL
                 self.pin_7 = board.IO7 # Reset
+                self.i2c = busio.I2C(self.pin_5, self.pin_4)
             
             self.triggerSPI = False
         
@@ -103,19 +114,23 @@ class Hardware():
         self.trigger.direction = Direction.INPUT
         self.trigger.pull = Pull.UP
 
-        # Setup Buzzer. Can be any digital Pin
+        # Setup Buzzer. 
         self.buzzer = self.pin_3
-        self.mute_sound = False
+        self.mute_sound = False # Can mute
         
-        # Score display
-        self.display = segments.Seg14x4(self.i2c)
+        self.display = segments.Seg14x4(self.i2c) # Score display HT16K33
 
-        # Prepare Neopixel Config
+        # Prepare Neopixel Config 8x32 or 16x16
         self.panel_16x16 = panel_16x16
         self.panel_num = 2
-        self.panel_rotation = 3
+        # The rotation setting:
+        # 0, 2 - 32 width x 16 height
+        # 1, 3 - 16 width x 32 height
+        # the difference between two pairs is that are both rotated in 180 degrees
+        # related to each other.
+        self.panel_rotation = 1 # 90 degrees
         
-        if self.panel_16x16:
+        if self.panel_16x16: 
             self.panel_width = 16
             self.panel_height = 16
             self.pixel_width = self.panel_width
@@ -135,7 +150,7 @@ class Hardware():
             self.pixel_brightness = 0.6
             
         if self.triggerSPI:
-            # Using SPI Hack to improve speed
+            # There is a Neopixel hack library that improve speed
             import neopixel_spi as neopixel
             
             self.pixels = neopixel.NeoPixel_SPI(
@@ -145,6 +160,7 @@ class Hardware():
                 auto_write=False,
             )
         else:
+            # Use common Neopixel Library
             import neopixel
             self.pixel_pin = self.pin_6
             self.pixels = neopixel.NeoPixel(
@@ -156,7 +172,7 @@ class Hardware():
         
         # Neopixel as Screen
         if self.panel_16x16:
-            # Import original Adafruit Library
+            # Import original Adafruit Library - better
             from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
             self.screen= PixelFramebuffer(
                 self.pixels,
@@ -165,7 +181,7 @@ class Hardware():
                 rotation=self.panel_rotation,
             )
         else:
-            # Import my custom version
+            # Import my custom version - rough
             from tile_framebuf import TileFramebuffer
             self.screen = TileFramebuffer(
                 self.pixels,
@@ -176,6 +192,7 @@ class Hardware():
             )
     
     def __str__(self):
+        # Show the entire hardware config. Useful to find out pinout scheme
         self.hardware_config = {
             "Pin_Joystick_X": [self.pin_0, self.joystick_x],
             "Pin_Joystick_Y": [self.pin_1, self.joystick_y],
@@ -202,20 +219,20 @@ class Hardware():
     
         return f'Expected Hardware Configuration:\n{string_format}'
     
-    def play_rttl (self, song):
+    def play_rtttl (self, song):
         if not self.mute_sound:
             adafruit_rtttl.play (self.buzzer, song)
         
     def get_joystick(self):
         # Returns -1, 0, or 1 depending on joystick position
         x_coord = int(map_range(self.joystick_x.value, 200, 65535, -2, 2))
-        y_coord = int(map_range(self.joystick_y.value, 200, 65535, -2, 2))
+        y_coord = int(map_range(self.joystick_y.value, 200, 65535, 2, -2))
         return x_coord, y_coord
 
     def get_direction(self):
         # This function is a little bit different than usual joystick function
         x = int(map_range(self.joystick_x.value, 200, 65535, -1.5, 1.5)) # X up down
-        y = int(map_range(self.joystick_y.value, 200, 65535,  -1.5, 1.5)) # Y Left Right
+        y = int(map_range(self.joystick_y.value, 200, 65535,  1.5, -1.5)) # Y Left Right
         if abs(x) > abs(y):
             return (x, 0)  # Horizontal Move
         else:
@@ -248,6 +265,8 @@ class Hardware():
         return color == colorcheck
 
     def display_bitmap(self,tile_width, tile_height, bitmap, frame_index=0):
+        # All images routines are memory hunger...
+        # I don't know why... Is just a small bitmap 16x32 pixels.
         gc.collect()
         bitmap_width = bitmap.width
         bitmap_height = bitmap.height
@@ -264,7 +283,7 @@ class Hardware():
             tile_x = 0
             tile_y = 0
         
-        for x in range(tile_width):
+        for x in range(tile_width): # A rotina está imprimindo as imagens espelhadas
             for y in range(tile_height):
 
                 pixel_color = bitmap[tile_x + x, tile_y + y]
@@ -276,17 +295,15 @@ class Hardware():
                 r = (r * 255) // 31
                 g = (g * 255) // 63
                 b = (b * 255) // 31
-                # Ajustar as coordenadas para a tela de 32x16 de acordo com a rotação
-                # Isso não está funcionando para todas as rotações
                 
                 if self.screen.rotation == 0: 
-                    self.screen.pixel(x, y, (r, g, b))
-                elif self.screen.rotation == 1:
-                    self.screen.pixel(15 - x, y, (r, g, b))
-                elif self.screen.rotation == 2:
                     self.screen.pixel(y, x, (r, g, b))
-                elif self.screen.rotation == 3: # Consegui resolver esse.
-                    self.screen.pixel(15 - x, 31 - y, (r, g, b))
+                elif self.screen.rotation == 1:
+                    self.screen.pixel(x, y, (r, g, b))
+                elif self.screen.rotation == 2:
+                    self.screen.pixel(31-y, 15-x, (r, g, b))
+                elif self.screen.rotation == 3: 
+                    self.screen.pixel(15-x, 31-y, (r, g, b))
         
-        del pixel_color
+        del pixel_color # free up memory
         gc.collect()

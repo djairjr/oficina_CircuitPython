@@ -1,23 +1,23 @@
-'''
-    Console Menu System
-    Choose the game and play
-'''
-
-import time, gc, adafruit_imageload, displayio
+import time
+import gc
+import adafruit_imageload
+import displayio
 from hardware import Hardware
 
-class Menu():
-    
-    def __init__ (self, hardware):
-        self.game_list = ['Snake', 'Maze', 'Arkanoid', 'Tetris', 'Space Invaders', 'Enduro']
+class Menu:
+    def __init__(self, hardware):
+        self.game_list = ['Snake', 'Maze', 'Arkanoid', 'Tetris', 'Space Invaders']
+        self.game_amount = len (self.game_list)
         self.hardware = hardware
+        self.hardware.screen.fill(0)
+        self.hardware.screen.display()
+        print (self.hardware)
         self.frame_index = 0  
         self.joystick_delay = 0.1  
         self.last_joystick_time = time.monotonic()
-        
+
         # Load the sprite sheet (bitmap) with all games
         self.sprite_sheet, self.palette = adafruit_imageload.load(
-            # Image with 96 pixels width and 32 pixels height. Contains 6 frames 16x32
             "images/allGames.bmp",
             bitmap=displayio.Bitmap,
             palette=displayio.Palette,
@@ -28,77 +28,85 @@ class Menu():
             bitmap=displayio.Bitmap,
             palette=displayio.Palette,
         )
-        
-        self.hardware.screen.fill(0)
+
         self.hardware.display_bitmap(16, 32, self.start_game)
         self.hardware.screen.display()
-        self.hardware.display.marquee ('Select Game    ', loop = False)
+        self.hardware.display.marquee('OOOOoooo____', loop=False)
         self.update()
 
     def coinSound(self):
-        self.hardware.play_rttl ('Coin:d=4,o=6,b=440:c6,8d6,8e6,8f6')
+        self.hardware.play_rtttl('Coin:d=4,o=6,b=440:c6,8d6,8e6,8f6')
 
     def menuLeft(self):
-        self.hardware.play_rttl ('menuleft:d=4,o=4,b=600:a4,f4')
+        self.hardware.play_rtttl('menuleft:d=4,o=4,b=600:a4,f4')
         
     def menuRight(self):
-        self.hardware.play_rttl ('menuright:d=4,o=4,b=600:f4,a4')
+        self.hardware.play_rtttl('menuright:d=4,o=4,b=600:f4,a4')
 
     def update(self):
         while True:
-            # Limpar a tela
             self.hardware.screen.fill(0)
-            
-            # Exibir o tile atual na tela Neopixel   
             self.hardware.display_bitmap(16, 32, self.sprite_sheet, self.frame_index)
             self.hardware.screen.display()
-            self.hardware.display.print (self.game_list[self.frame_index][:4])
+            self.hardware.display.print(self.game_list[self.frame_index][:4])
             
-            # Verificar a posição do joystick
             current_time = time.monotonic()
             if current_time - self.last_joystick_time >= self.joystick_delay:
-
                 x_coord, y_coord = self.hardware.get_joystick()
 
-                if y_coord == -1:  # Joystick para a direita
+                if y_coord == 1:
                     self.menuRight()
-                    self.frame_index = (self.frame_index + 1) % 6
-                    if self.frame_index > 5:
-                        self.frame_index = 0
+                    self.frame_index = (self.frame_index + 1) % self.game_amount
                     self.last_joystick_time = current_time
-                elif y_coord == 1:  # Joystick para a esquerda
+                elif y_coord == -1:
                     self.menuLeft()
-                    if self.frame_index < 0:
-                        self.frame_index = 5
-                    self.frame_index = (self.frame_index - 1) % 6
+                    self.frame_index = (self.frame_index - 1) % self.game_amount
                     self.last_joystick_time = current_time
                                       
-                # Verificar se o botão trigger foi pressionado
-                if not self.hardware.trigger.value:  # Botão pressionado (trigger é ativo-baixo)
-                    print(self.game_list[self.frame_index])
+                if not self.hardware.trigger.value:
+                    selected_game = self.game_list[self.frame_index]
+                    print(selected_game)
                     self.coinSound()
                     self.hardware.screen.fill(0)
                     self.hardware.screen.display()
-                    time.sleep(0.5)  # Debounce delay
+                    time.sleep(0.5)
+
+                    self.cleanup()
+                    gc.collect()
                     
-                    if self.game_list[self.frame_index] == 'Snake':
+                    if selected_game == 'Snake':
                         from snake_as_class import Snake
-                        snakegame = Snake(self.hardware)
-                        snakegame.play()
-                    elif self.game_list[self.frame_index] == 'Maze':
-                        gc.collect()
+                        game = Snake(self.hardware)
+                    elif selected_game == 'Maze':
                         from maze_as_class import MazeGame
-                        mazegame = MazeGame(self.hardware)
-                        mazegame.play()
-                    elif self.game_list[self.frame_index] == 'Arkanoid':
-                        gc.collect()
+                        game = MazeGame(self.hardware)
+                    elif selected_game == 'Arkanoid':
                         from arkanoid_as_class import Arkanoid
-                        arkanoid = Arkanoid(self.hardware)
-                        arkanoid.play()
+                        game = Arkanoid(self.hardware)
+                    elif selected_game == 'Tetris':
+                        from tetris_as_class import Tetris
+                        game = Tetris(self.hardware)
+                    elif selected_game == 'Space Invaders':
+                        from space_as_class import SpaceInvaders
+                        game = SpaceInvaders(self.hardware)
                     else:
                         break
-# If 32x8 panel        
-hardware = Hardware(panel_16x16 = False)
-# If 16x16 panel
-# hardware = Hardware()
-menu = Menu (hardware)
+
+                    game.play()
+                    break
+
+    def cleanup(self):
+        #print ("Limpando a memória ")
+        #print ("Antes ", gc.mem_free())
+        self.sprite_sheet = None
+        self.palette = None
+        self.start_game = None
+        self.palette_start = None
+        self.hardware.screen.fill(0)
+        self.hardware.screen.display()
+        gc.collect()
+        #print ("Depois ", gc.mem_free())
+
+if __name__ == "__main__":
+    hardware = Hardware(panel_16x16=False)
+    menu = Menu(hardware)
