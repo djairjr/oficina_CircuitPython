@@ -9,118 +9,26 @@
     Available at: https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel/libraries
 """
 
-import time, gc
+import time, gc, asyncio
 import board, random
-import neopixel_spi as neopixel
-
-# To display Level Change Message in Rainbow Marquee
-from adafruit_display_text.bitmap_label import Label
-from adafruit_bitmap_font import bitmap_font
-from displayio import Bitmap
-from rainbowio import colorwheel
-import terminalio
-
-# Treating Joystick
-from analogio import AnalogIn
-from digitalio import DigitalInOut, Direction, Pull
-from simpleio import map_range
-
-# Adding simple RTTTL Sound
 import adafruit_rtttl
-
-# My custom version of Library
-from tile_framebuf import TileFramebuffer
-spi = board.SPI()
-
-pixel_pin = board.D10
-pixel_width = 32
-pixel_height = 8
-num_tiles = 2
-num_pixels = pixel_width * pixel_height * num_tiles
-
-joystick_x = AnalogIn(board.A0)
-joystick_y = AnalogIn(board.A1)
-
-trigger = DigitalInOut (board.D2)
-trigger.direction = Direction.INPUT
-trigger.pull = Pull.UP
-
-buzzer = board.D3
-
-pixels = neopixel.NeoPixel_SPI(
-    spi,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
-    brightness=0.2,
-    auto_write=False,
-)
-
-screen = TileFramebuffer(
-    pixels,
-    pixel_width,
-    pixel_height,
-    num_tiles,
-    rotation = 0
-)
-
-# Load Bitmap Font
-font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
-
-def get_direction():
-    # This function is a little bit different than usual joystick function
-    x = int(map_range(joystick_x.value, 200, 65535, -1.5, 1.5)) # X up down
-    y = int(map_range(joystick_y.value, 200, 65535,  -1.5, 1.5)) # Y Left Right
-    if abs(x) > abs(y):
-        return (x, 0)  # Horizontal Move
-    else:
-        return (0, y)  # Vertical Move
-
-
-def get_pixel_color(x, y):
-    # Adjusting coordinates based on rotation
-    if screen.rotation == 1:
-        x, y = y, x
-        x = screen._width - x - 1
-    elif screen.rotation == 2:
-        x = screen._width - x - 1
-        y = screen._height * screen._tile_num - y - 1
-    elif screen.rotation == 3:
-        x, y = y, x
-        y = screen._height * screen._tile_num - y - 1
-
-    # Check if coordinates are in valid limits
-    if (0 <= x < screen._width) and (0 <= y < screen._height * screen._tile_num):
-        # Get pixel adjusting screen position
-        rgbint = screen.format.get_pixel(screen, x, y)
-        return (rgbint // 256 // 256 % 256, rgbint // 256 % 256, rgbint % 256)
-
-    # Black (0, 0, 0) if out bounds
-    return (0, 0, 0)
-
-# Set pixel color
-def set_pixel_color(x, y, color):
-    screen.pixel(x, y, color)
-
-# Check if is valid movement
-def is_valid_move(x, y):
-    if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
-        return False
-    color = get_pixel_color(x, y)
-    return color != (0, 255, 255)  # Wall color is 0x00ffff
-
-# Check end of maze
-def is_end(x, y):
-    color = get_pixel_color(x, y)
-    # print(f"Check if ({x}, {y}) is end maze: {color}")
-    return color == (0, 255, 0)  # End Color is 0x00ff00
+from hardware import Hardware
 
 class Maze():
     # This class create and draw a maze
-    def __init__(self, screen):
-        self.screen = screen
-        self.height = self.screen.height * self.screen._tile_num
-        self.width = self.screen.width // 2
+    def __init__(self, hardware):
+        gc.collect()
+        self.hardware = hardware
+        
+        if self.hardware.screen.rotation == 1 or self.hardware.screen.rotation == 3:
+            self.height = self.hardware.screen.height
+            self.width = self.hardware.screen.width
+        else:
+            self.height = self.hardware.screen.width
+            self.width = self.hardware.screen.height
+            
         self.__unvisited = 'u'
-        self.__cell = 'c'
+        self.__cell = ' '
         self.__walls = 'w'
         self.__entry = 'e'
         self.__exit = 'x'
@@ -152,25 +60,34 @@ class Maze():
         self.draw()
         
     def draw(self):
-        self.screen.fill(0x00000)
+        gc.collect()
+        self.hardware.screen.fill(0x00000)
+        
         for i in range(0, self.height):
             for j in range(0, self.width):
                 if (self.maze[i][j] == self.__unvisited):
-                    self.screen.pixel (i,j, 0xffffff)
+                    self.hardware.screen.pixel (i,j, 0xffffff)
                     
                 elif (self.maze[i][j] == self.__cell):
-                    self.screen.pixel (i,j, 0x000000)
+                    self.hardware.screen.pixel (i,j, 0x000000)
                     
                 elif (self.maze[i][j] == self.__exit):
-                    self.screen.pixel (i,j, 0x00ff00)
+                    self.hardware.screen.pixel (i,j, 0x00ff00)
                     self.set_exit (i,j)
                     
                 elif (self.maze[i][j] == self.__entry):
-                    self.screen.pixel (i,j, 0xff0000)
+                    self.hardware.screen.pixel (i,j, 0xff0000)
                     self.set_entry (i,j)
                 else:
-                    self.screen.pixel (i,j, 0x00ffff)
-        screen.display()
+                    self.hardware.screen.pixel (i,j, 0x00ffff)
+        '''
+        position = 0
+        for line in self.maze:
+            print (position, line)
+            position+=1
+        '''
+        gc.collect()
+        self.hardware.screen.display()
 
     # Find number of surrounding cells
     def surroundingCells(self, rand_wall):
@@ -197,6 +114,7 @@ class Maze():
         # Randomize starting point and set it a cell
         starting_height = int(random.random()*self.height)
         starting_width = int(random.random()*self.width)
+        
         if (starting_height == 0):
             starting_height += 1
         if (starting_height == self.height-1):
@@ -389,74 +307,108 @@ class Maze():
                 self.maze[self.height-1][i] = self.__exit
                 break
 
-class Game:
+class MazeGame:
     # Main Game Class
-    def __init__(self):
-        self.maze = Maze(screen)
+    def __init__(self, hardware, time_limit=60):
+        gc.collect()
+        self.hardware = hardware
+        
+        self.maze = Maze(self.hardware)
         self.level_count = 1
         self.player_x, self.player_y = self.maze.get_entry()
-    
+        self.new_x, self.new_y = self.player_x, self.player_y
+        self.time_limit = time_limit
+        self.score = 0
+           
+    def gameOver(self):
+        self.hardware.display.marquee ("GAME OVER    ", loop = False)
+        gc.collect()
+        self.level_count = 1
+        self.time_limit = 60
+        self.score = 0
+        self.maze = Maze(self.hardware.screen)
+        self.player_x, self.player_y = self.maze.get_entry()
+        self.play()
+        
+    async def countdown(self):
+        gc.collect()
+        current_time = time.monotonic()
+        end_time = current_time + self.time_limit
+
+        while current_time < end_time:
+            remaining_time = end_time - current_time
+            self.mins, self.secs = divmod(remaining_time, 60)
+            self.mins, self.secs = int(self.mins), int(self.secs)  # Converter para inteiros
+            timeformat = '{:04d}'.format(self.mins *60 + self.secs)
+            self.hardware.display.print(timeformat)
+            await asyncio.sleep(0.1)
+            current_time = time.monotonic()
+        
+        self.gameOver()
+           
     # Sound effects
     def moveSound(self):
-        adafruit_rtttl.play (buzzer, "move:d=4,o=5,b=880:8c6")
+        self.hardware.play_rttl ("move:d=4,o=5,b=880:16c4,16a4")
 
     def endLevelSound(self):
-        adafruit_rtttl.play (buzzer, "endlevel:d=4,o=5,b=330:8c6,8d6")
+        self.hardware.play_rttl ("endlevel:d=4,o=5,b=330:16c6,16d6")
     
-    def display_message(self, message, color):
-        # Marquee Message
-        label = Label(text=message, font=font, scale=2)
-        bitmap = label.bitmap
-        colors = [0, 0]
-        hue = 0
-        start_time = time.time()
-        while time.time() - start_time < 2:  # Display for 2 seconds
-            for x in range(bitmap.width):
-                hue = hue + 7
-                if hue >= 256:
-                    hue = hue - 256
-                colors[1] = colorwheel(hue)
-
-                for a in range(screen.width - 1):
-                    for y in range(screen.height):
-                        screen.pixel(a, y, screen.pixel(a + 1, y))
-
-                for y in range(screen.height):
-                    bm_y = y - 6 #offset
-                    if 0 <= bm_y < bitmap.height:
-                        color_index = bitmap[x, bm_y]
-                    else:
-                        color_index = 0
-                    screen.pixel(screen.width - 1, y, colors[color_index])
-
-                screen.display()
-                gc.collect()
-                time.sleep(0.02)
-
-    def play(self):
+    async def run_game(self):
+        gc.collect()
+        # Inicia a contagem regressiva em segundo plano
+        self.countdown_task = asyncio.create_task(self.countdown())
+        
         while True:
-            screen.pixel(self.player_x, self.player_y, (0, 0, 0))
-            dx, dy = get_direction()
+            gc.collect()
+            self.hardware.screen.pixel(self.player_x, self.player_y, (0, 0, 0))
+            
+            dx, dy = self.hardware.get_direction()
+
             if dx != 0 or dy != 0:
-                self.moveSound()
-                new_x = self.player_x - dx
-                new_y = self.player_y - dy
-                if is_valid_move(new_x, new_y):
-                    self.player_x = new_x
-                    self.player_y = new_y
-                    if is_end(self.player_x, self.player_y):
-                        screen.pixel(self.player_x, self.player_y, (255, 0, 0))
-                        screen.display()
-                        self.endLevelSound()
-                        self.level_count += 1
-                        # Write a Message
-                        self.display_message(f' Level {self.level_count} ', 0xff0000)
-                        self.maze.redraw()
-                        self.player_x, self.player_y = self.maze.get_entry()
+                
+                # Increase or decrease player position
+                self.new_x = self.player_x + dy
+                self.new_y = self.player_y - dx
+                print (self.new_x, self.new_y)
+                
+                if self.hardware.check_wall(self.new_x, self.new_y, (0,255,255)):
+                    # No wall?
+                    self.moveSound()
+                    self.player_x = self.new_x
+                    self.player_y = self.new_y
+                    
+                    
+                # Check if is end of maze (Green Color)
+                if self.hardware.check_color(self.player_x, self.player_y, 0x00ff00):
+                    self.hardware.screen.pixel(self.player_x, self.player_y, (255, 0, 0))
+                    self.hardware.screen.display()
+                    self.endLevelSound()
+                    self.level_count += 1
+                    self.score = self.score + self.secs * 10
+                    print (self.secs, self.score)
+                    # Reinicia a contagem regressiva para o próximo nível
+                    if self.countdown_task:
+                        self.countdown_task.cancel()
+                        self.countdown_task = asyncio.create_task(self.countdown())
+                    # Write a Message
+                    self.hardware.display.marquee (f' Score {self.score}    Level {self.level_count}    ', loop=False)
+                    self.maze.redraw()
+                    self.player_x, self.player_y = self.maze.get_entry()
+                
+                               
 
-            screen.pixel(self.player_x, self.player_y, (255, 0, 0))
-            screen.display()
-            time.sleep(0.1)
+            self.hardware.screen.pixel(self.player_x, self.player_y, (255, 0, 0))
+            
+            self.hardware.screen.display()
+            await asyncio.sleep(0.1)
+        
+    def play(self):
+        gc.collect()
+        self.hardware.display.marquee("Maze Game    ", loop=False)
+        asyncio.run(self.run_game())
 
-game = Game()
-game.play()
+hardware = Hardware(panel_16x16 = False)
+print (hardware)
+
+maze = MazeGame(hardware)
+maze.play()
