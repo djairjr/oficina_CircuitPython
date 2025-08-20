@@ -78,18 +78,26 @@ led.direction = Direction.OUTPUT
 # Frequência é medida em Hertz. Indica a quantidade de ciclos de um evento por segundo
 # Nós estamos considerando como ciclo, o tempo em que o LED acende e apaga.
 
-frequencia = 60 # de 60 a 90hz a visão humana registra os pulsos como continuidade.
+frequencia = 60 
 periodo_total = 1 / frequencia
 
-# Você consegue usar o potenciômetro para variar a intensidade do LED? Como?
+# Nosso sistema vai perguntar para o usuário, qual a intensidade do Led.
 duty_cicle = int (input ( 'Digite a intensidade do LED em porcentagem (0 a 100%: )')) / 100
+
+# Ele vai fazer um cálculo, subtraindo o tempo total do ciclo (1), do tempo em que o ciclo
+# está ativo (duty_cicle) e com isso, vai encontrar o tempo em que o led fica inativo.
 inactive_time = 1 - duty_cicle
 
 while True:
-  led.value = True
-  time.sleep (duty_cicle * periodo_total) 
-  led.value = False
-  time.sleep (inactive_time * periodo_total)
+  led.value = True # Acende o Led
+  time.sleep (duty_cicle * periodo_total) # Espera o tempo de led ativo
+  led.value = False # Apaga o Led
+  time.sleep (inactive_time * periodo_total) # Espera o tempo de led inativo e volta pro começo do loop
+
+# No código acima, como você faria para usar o potenciômetro para alterar a intensidade do brilho do led?
+# Dica: ao invés de perguntar para o usuário antes do loop, você pode fazer a leitura analógica
+# do potenciômetro e usar matemática para definir os valores de duty_cicle e inactive_time
+# Que tal usar a função get_voltage e convertê-la para usar porcentagens, ao invés de tensões?
 ```
 
 #### **3. Conversores (Conceitos Importantes)**
