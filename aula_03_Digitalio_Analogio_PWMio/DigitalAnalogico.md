@@ -41,6 +41,7 @@ while True: # crio um loop infinito
 **Potenciômetro (Analógico)**
 - Gira → varia tensão (0V a 3.3V)
 - Exemplo: controle de volume ou de intensidade. Controle de direção (Joystick Analógico)
+
 ```
 # Lê o valor de tensão no pino analógico
 
@@ -87,8 +88,6 @@ while True:
   led.value = False
   time.sleep (inactive_time * periodo_total)
 ```
-
-
 
 #### **3. Conversores (Conceitos Importantes)**
 **ADC (Conversor Analógico-Digital)**
