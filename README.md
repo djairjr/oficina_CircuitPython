@@ -5,7 +5,7 @@ Eu sou programador desde 1984! Sim... Faz tempo mesmo...
 
 Tenho uma página no [Hackster](https://www.hackster.io/nicolaudosbrinquedos), que é uma plataforma muito bacana de compartilhamento
 de soluções do tipo faça-você-mesmo. 
-E também, tenho um perfil no [Instructables] (https://www.instructables.com/member/nicolaudosbrinquedos/), que é bem similar.
+E também, tenho um perfil no [Instructables](https://www.instructables.com/member/nicolaudosbrinquedos/), que é bem similar.
 
 # Oficina de Circuitpython
 
