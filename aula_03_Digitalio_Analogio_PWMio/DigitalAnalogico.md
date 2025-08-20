@@ -8,7 +8,8 @@
 
 #### **2. Componentes da Experiência**
 ![Pinagem do Seeed Xiao RP2040](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Seeedstudio-Seeeduino-XIAO-RP2040-Microcontroller-Board-Pinout-Diagram-1-1536x1046.jpg)
-![Diagrama da Montagem da aula 3] (https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Diagrama%20Aula%203_bb.png)
+
+![Montagem da Aula](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Montagem_Aula_3.png))
 
 **Botão (Digital)**
 - Apertado = 0 / Solto = 1
