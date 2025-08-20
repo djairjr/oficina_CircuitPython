@@ -114,8 +114,46 @@ while True: # Esse é o nosso loop principal
 # Que tal usar a função get_voltage e convertê-la para usar porcentagens, ao invés de tensões?
 # Qual a diferença entre colocar a leitura do potenciômetro dentro do loop principal ou fora dele?
 ```
+#### **3. Usando saídas em PWM do RP2040**
+O RP2040 possui diversas saídas PWM. Neste caso, não precisamos fazer todo o cálculo do duty_cicle.
+Nós podemos usar uma biblioteca, a pwmio, para cuidar disso para nós. No exemplo abaixo, vamos descobrir
+quais são os pinos do Xiao que podem ser usados como saída PWM.
 
-#### **3. Conversores (Conceitos Importantes)**
+```
+import board
+import pwmio
+
+for pin_name in dir(board): # Quais são os pinos do RP2040 que são PWM?
+    pin = getattr(board, pin_name)
+    try:
+        p = pwmio.PWMOut(pin)
+        p.deinit()
+        print("PWM on:", pin_name)  # Prints the valid, PWM-capable pins!
+    except ValueError:  # This is the error returned when the pin is invalid.
+        print("No PWM on:", pin_name)  # Prints the invalid pins.
+    except RuntimeError:  # Timer conflict error.
+        print("Timers in use:", pin_name)  # Prints the timer conflict pins.
+    except TypeError:  # Error returned when checking a non-pin object in dir(board).
+        pass  # Passes over non-pin objects in dir(board).
+```
+
+No exemplo abaixo, vamos fazer o led piscar, com efeito de fade...
+
+```
+import time, pwmio, board
+led = pwmio.PWMOut (board.LED, frequency=5000, duty_cycle=0)
+while True:
+    for i in range(100):
+        # PWM LED up and down
+        if i < 50:
+            led.duty_cycle = int(i * 2 * 65535 / 100)  # Up
+        else:
+            led.duty_cycle = 65535 - int((i - 50) * 2 * 65535 / 100)  # Down
+        time.sleep(0.01)
+```
+
+
+#### **4. Conversores (Conceitos Importantes)**
 **ADC (Conversor Analógico-Digital)**
 - Transforma tensão do potenciômetro em números (0-65535)
 - Isso é algo que já está implementado na Xiao, nos pinos A0, A1, A2, A3
@@ -132,7 +170,7 @@ while True: # Esse é o nosso loop principal
 - *Observação: Nosso Xiao RP2040 não tem DAC, mas é importante conhecer o conceito*
 
 
-#### **4. Fluxo Completo (Nosso Projeto)**
+#### **5. Fluxo Completo (Nosso Projeto)**
 1. Potenciômetro gera tensão analógica
 2. ADC converte para número digital
 3. Número é usado no PWM para controlar LED
