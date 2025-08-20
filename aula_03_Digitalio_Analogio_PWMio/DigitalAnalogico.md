@@ -1,18 +1,44 @@
 ### **Explicação Simplificada para Leigos - CircuitPython no Seeed Xiao RP2040**
 
+
 #### **1. Conceitos Fundamentais**
 **Sinais Digitais vs Analógicos**
 - **Digital**: Valores exatos (0 ou 1) - como um interruptor de luz
-- **Analógico**: Variação contínua - como um dimmer de luz
+- **Analógico**: Variação contínua ampla faixa de valores - como um dimmer de luz
 
 #### **2. Componentes da Experiência**
+![Pinagem do Seeed Xiao RP2040]([https://myoctocat.com/assets/images/base-octocat.svg](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Seeedstudio-Seeeduino-XIAO-RP2040-Microcontroller-Board-Pinout-Diagram-1-1536x1046.jpg))
+![Diagrama da Montagem da aula 3] (https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Diagrama%20Aula%203_bb.png)
+**Botão (Digital)**
+- Apertado = 0 / Solto = 1
+- Exemplo: interruptor simples
+`
+import board # Módulo que faz a interface entre o Circuitpython e os nomes dos pinos na plaquinha
+import digitalio # Módulo que cuida das entradas e saídas digitais
+from digitalio import DigitalInOut, Direction, Pull # ou você pode importar somente aquilo que vai usar
+
+led = DigitalInOut (board.D7) # Indica que a variável led vai representar uma entrada ou saída digital no pino D7 da placa
+
+led.direction = Direction.OUTPUT # Determina que a variável led vai representar especificamente uma saída digital
+led.value = False # Atribui o valor False (Zero) ao led, fazendo com que ele apague.
+
+botao = DigitalInOut (board.D6) # Indica que a variavel botao vai representar uma entrada ou saída digital no pino D6 da placa
+botao.direction = Direction.INPUT # Determina que a variável botão vai representar específicamente uma entrada digital
+botao.pull = Pull.UP # Determina que, quando o botão não estiver sendo pressionado, o valor dele será UP (True).
+
+print (botao.value) # deve exibir True, se o botão não estiver pressionado e False, se estiver.
+
+while True: # crio um loop infinito
+  if botao.value == False:  # Se o botão estiver pressionado
+    print ('Botão Pressionado')
+    led.value = True # Acende o Led
+  else:
+    led.value = False # Apaga o Led
+`
+
 **Potenciômetro (Analógico)**
 - Gira → varia tensão (0V a 3.3V)
 - Exemplo: controle de volume
-
-**Botão (Digital)**
-- Apertado = 1 / Solto = 0
-- Exemplo: interruptor simples
 
 **LED com PWM**
 - Brilho controlado por pulsos rápidos
