@@ -40,11 +40,55 @@ while True: # crio um loop infinito
 
 **Potenciômetro (Analógico)**
 - Gira → varia tensão (0V a 3.3V)
-- Exemplo: controle de volume
+- Exemplo: controle de volume ou de intensidade. Controle de direção (Joystick Analógico)
+```
+# Lê o valor de tensão no pino analógico
+
+import time, board
+from analogio import AnalogIn
+
+potenciometro = AnalogIn (board.A2)
+
+# Criando uma função com def
+def get_voltage (pin):
+  # pin.value vai retornar um valor entre 0 e 65536. 
+  # 3.3 é a tensão máxima.
+  return (pin.value * 3.3) / 65536
+
+while True:
+  print (get_voltage (potenciometro)) # Usando a minha função definida
+  time.sleep (0.1)
+```
 
 **LED com PWM**
 - Brilho controlado por pulsos rápidos
 - Exemplo: dimmer digital
+
+```
+import time, board
+from digitalio import DigitalInOut, Pull, Direction
+
+led = DigitalInOut (board.D7) # Se quiser usar os Leds da plaquinha board.LED
+led.direction = Direction.OUTPUT
+
+# Frequência é medida em Hertz. Indica a quantidade de ciclos de um evento por segundo
+# Nós estamos considerando como ciclo, o tempo em que o LED acende e apaga.
+
+frequencia = 60 # de 60 a 90hz a visão humana registra os pulsos como continuidade.
+periodo_total = 1 / frequencia
+
+# Você consegue usar o potenciômetro para variar a intensidade do LED? Como?
+duty_cicle = int (input ( 'Digite a intensidade do LED em porcentagem (0 a 100%: )')) / 100
+inactive_time = 1 - duty_cicle
+
+while True:
+  led.value = True
+  time.sleep (duty_cicle * periodo_total) 
+  led.value = False
+  time.sleep (inactive_time * periodo_total)
+```
+
+
 
 #### **3. Conversores (Conceitos Importantes)**
 **ADC (Conversor Analógico-Digital)**
