@@ -69,6 +69,8 @@ vão agilizar a sua vida...
 
 Tod Bot CircuitPython Tricks. (https://github.com/todbot/circuitpython-tricks)
 
+Eu também descobri esse canal no Youtube, Circuitpython School que é muito bom. (https://www.youtube.com/playlist?list=PLBJJ76R_ry5T3X72OIDkMOXQIdmcvSkue)
+
 # Tenho que instalar alguma coisa no meu computador? Como eu faço para começar?
 
 O Circuitpython é um firmware específico que você vai precisar instalar na sua plaquinha
