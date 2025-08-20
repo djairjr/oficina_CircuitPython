@@ -1,6 +1,6 @@
 ### **Explicação Simplificada para Leigos - CircuitPython no Seeed Xiao RP2040**
 
-**Link para Compra da plaquinha no AliExpress**
+**Link para Compra da Seeed Xiao RP2040 ou RP2350**
 
 [Plaquinha Seeed Xiao RP2040 na loja oficial](https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html?sensecap_affiliate=TXM32IP&referring_service=link)
 
