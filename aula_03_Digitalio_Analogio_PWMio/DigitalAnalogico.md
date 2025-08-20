@@ -12,7 +12,7 @@
 **Botão (Digital)**
 - Apertado = 0 / Solto = 1
 - Exemplo: interruptor simples
-`
+```
 import board # Módulo que faz a interface entre o Circuitpython e os nomes dos pinos na plaquinha
 import digitalio # Módulo que cuida das entradas e saídas digitais
 from digitalio import DigitalInOut, Direction, Pull # ou você pode importar somente aquilo que vai usar
@@ -34,7 +34,7 @@ while True: # crio um loop infinito
     led.value = True # Acende o Led
   else:
     led.value = False # Apaga o Led
-`
+```
 
 **Potenciômetro (Analógico)**
 - Gira → varia tensão (0V a 3.3V)
