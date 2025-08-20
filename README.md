@@ -146,7 +146,10 @@ E pode ser utilizada para executar comandos na placa e obter resultados imediato
 # Usando o Shell para aprender 
 
 Antes de botarmos a mão na massa e criarmos o nosso primeiro programa, vamos descobrir o que 
-a nossa plaquinha pode fazer, explorando os mecanismos de ajuda disponíveis no Python.
+a nossa plaquinha pode fazer, explorando os mecanismos de ajuda disponíveis no Python. 
+Acostume-se a usar a ajuda nativa, porque é sempre muito complicado memorizar tantos comandos.
+Dois comandos são fundamentais: help e dir
+
 
 Clique logo depois de '>>>' na aba do Shell e digite o comando abaixo
 ```
