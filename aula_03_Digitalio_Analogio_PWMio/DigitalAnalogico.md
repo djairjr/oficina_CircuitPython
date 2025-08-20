@@ -60,6 +60,9 @@ while True:
   print (get_voltage (potenciometro)) # Usando a minha função definida
   time.sleep (0.1)
 ```
+**PWM (Modulação por Largura de Pulso)**
+- "Engana" criando efeito analógico com digital
+- Controla brilho do LED variando tempo ligado/desligado
 
 **LED com PWM**
 - Brilho controlado por pulsos rápidos
@@ -92,7 +95,8 @@ while True:
 #### **3. Conversores (Conceitos Importantes)**
 **ADC (Conversor Analógico-Digital)**
 - Transforma tensão do potenciômetro em números (0-65535)
-- Como funciona:
+- Isso é algo que já está implementado na Xiao, nos pinos A0, A1, A2, A3
+- Funciona assim, o sistema lê os valores de tensão nesses pinos e os converte numa faixa de valores de 0 a 65535.
   - 0V → 0
   - 1.65V → 32768
   - 3.3V → 65535
@@ -104,9 +108,6 @@ while True:
   - Controlar motores com precisão
 - *Observação: Nosso Xiao RP2040 não tem DAC, mas é importante conhecer o conceito*
 
-**PWM (Modulação por Largura de Pulso)**
-- "Engana" criando efeito analógico com digital
-- Controla brilho do LED variando tempo ligado/desligado
 
 #### **4. Fluxo Completo (Nosso Projeto)**
 1. Potenciômetro gera tensão analógica
