@@ -71,9 +71,12 @@ while True:
 ```
 import time, board
 from digitalio import DigitalInOut, Pull, Direction
+from analogio import AnalogIn # Somente para ler o potenciometro
 
 led = DigitalInOut (board.D7) # Se quiser usar os Leds da plaquinha board.LED
 led.direction = Direction.OUTPUT
+
+potenciometro = AnalogIn (board.A2)
 
 # Frequência é medida em Hertz. Indica a quantidade de ciclos de um evento por segundo
 # Nós estamos considerando como ciclo, o tempo em que o LED acende e apaga.
@@ -82,13 +85,24 @@ frequencia = 60
 periodo_total = 1 / frequencia
 
 # Nosso sistema vai perguntar para o usuário, qual a intensidade do Led.
+# Se você optar por usar o potenciômetro, vai precisar calcular duty_cicle usando
+# uma leitura analógica do potenciômetro e a função get_voltage modificada
+# para encontrar uma porcentagem
 duty_cicle = int (input ( 'Digite a intensidade do LED em porcentagem (0 a 100%: )')) / 100
+
+# duty_cycle = descubra um jeito de usar o valor do potenciometro e convertê-lo em porcentagem
 
 # Ele vai fazer um cálculo, subtraindo o tempo total do ciclo (1), do tempo em que o ciclo
 # está ativo (duty_cicle) e com isso, vai encontrar o tempo em que o led fica inativo.
 inactive_time = 1 - duty_cicle
 
-while True:
+# Modifique essa função para que retorne um valor em porcentagem
+def get_voltage (pin):
+  # pin.value vai retornar um valor entre 0 e 65536. 
+  # 3.3 é a tensão máxima. E se quiséssemos o valor em porcentagem? De 0.0 a 1.0, por exemplo?
+  return (pin.value * 3.3) / 65536 # Você vai precisar mudar alguma coisa nessa linha aqui...
+
+while True: # Esse é o nosso loop principal
   led.value = True # Acende o Led
   time.sleep (duty_cicle * periodo_total) # Espera o tempo de led ativo
   led.value = False # Apaga o Led
@@ -98,6 +112,7 @@ while True:
 # Dica: ao invés de perguntar para o usuário antes do loop, você pode fazer a leitura analógica
 # do potenciômetro e usar matemática para definir os valores de duty_cicle e inactive_time
 # Que tal usar a função get_voltage e convertê-la para usar porcentagens, ao invés de tensões?
+# Qual a diferença entre colocar a leitura do potenciômetro dentro do loop principal ou fora dele?
 ```
 
 #### **3. Conversores (Conceitos Importantes)**
