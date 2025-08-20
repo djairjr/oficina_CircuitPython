@@ -1,6 +1,15 @@
+# Quem sou eu
+O meu nome é **Djair Guilherme**. Eu sou de teatro, mas trabalho a bastante tempo
+com desenvolvimento de aplicações para Arduino, Esp32, Raspberry Pi Pico.
+Eu sou programador desde 1984! Sim... Faz tempo mesmo...
+
+Tenho uma página no [Hackster](https://www.hackster.io/nicolaudosbrinquedos), que é uma plataforma muito bacana de compartilhamento
+de soluções do tipo faça-você-mesmo. 
+E também, tenho um perfil no [Instructables] (https://www.instructables.com/member/nicolaudosbrinquedos/), que é bem similar.
+
 # Oficina de Circuitpython
 
-O CircuitPython, desenvolvido pela equipe da Adafruit Industries, 
+O [CircuitPython](http://circuitpython.org), desenvolvido pela equipe da [Adafruit Industries](https://www.adafruit.com/), 
 é uma versão otimizada da linguagem de programação Python, projetada
 para o ambiente dos microcontroladores e plataformas de desenvolvimento 
 para computação embarcada.
@@ -38,13 +47,13 @@ Python é uma linguagem super bem documentada, com amplo suporte e uma comunidad
 CircuitPython é Python, com toda a facilidade do Python, mas com um conjunto reduzido de
 suas funcionalidades. 
 
-Eu indico o curso gratuito da Solyd, do Guilherme Junqueira. O Guilherme é muito engraçado
+Eu indico o curso gratuito da Solyd, do **Guilherme Junqueira**. O Guilherme é muito engraçado
 e o curso tem uma didática incrível. Foi através desse curso que eu comecei a programar
 em Python.
 (https://solyd.com.br/cursos/python-basico/)
 
 Também gosto muito de literatura específica para Python. O melhor livro para iniciantes é o 
-do professor Nilo Ney Coutinho Menezes. "Introdução a Programação com Python". É vendido
+do professor **Nilo Ney Coutinho Menezes**. "Introdução a Programação com Python". É vendido
 pela Novatec, mas pode ser encontrado on-line na Archive.org.
 
 (https://ia804504.us.archive.org/8/items/nilo-ney-coutinho-menezes-introducao-a-programacao-com-python-algoritmos-e-logic/Nilo%20Ney%20Coutinho%20Menezes%20-%20Introdu%C3%A7%C3%A3o%20%C3%A0%20programa%C3%A7%C3%A3o%20com%20Python_%20algoritmos%20e%20l%C3%B3gica%20de%20programa%C3%A7%C3%A3o%20para%20iniciantes-Novatec%20%282014%29.pdf)
@@ -55,25 +64,24 @@ Python CheatSheet.(https://www.pythoncheatsheet.org/)
 No site da Adafruit você vai encontrar toda sorte de tutoriais para utilizar CircuitPython.
 Tudo é bastante modular, cada biblioteca é bem explicada com exemplos úteis e funcionais.
 
-Indico especialmente esses três: 
+**Indico especialmente esses:** 
 
-Welcome to CircuitPython. (https://learn.adafruit.com/welcome-to-circuitpython/overview)
+[Welcome to CircuitPython](https://learn.adafruit.com/welcome-to-circuitpython/overview)
 
-CircuitPython Essentials. (https://learn.adafruit.com/circuitpython-essentials/circuitpython-essentials)
+[CircuitPython Essentials](https://learn.adafruit.com/circuitpython-essentials/circuitpython-essentials)
 
-Getting Started with Raspberry Pi Pico and CircuitPython. 
-(https://learn.adafruit.com/getting-started-with-raspberry-pi-pico-circuitpython?view=all)
+[Getting Started with Raspberry Pi Pico and CircuitPython](https://learn.adafruit.com/getting-started-with-raspberry-pi-pico-circuitpython?view=all)
 
 Além disso, o TodBot compilou uma série de dicas úteis no seu Github. Mais para frente, elas
 vão agilizar a sua vida...
 
-Tod Bot CircuitPython Tricks. (https://github.com/todbot/circuitpython-tricks)
+[Tod Bot CircuitPython Tricks](https://github.com/todbot/circuitpython-tricks)
 
-Eu também descobri esse canal no Youtube, Circuitpython School que é muito bom. (https://www.youtube.com/playlist?list=PLBJJ76R_ry5T3X72OIDkMOXQIdmcvSkue)
+Eu também descobri esse canal no Youtube, [Circuitpython School](https://www.youtube.com/playlist?list=PLBJJ76R_ry5T3X72OIDkMOXQIdmcvSkue)
 
 # Tenho que instalar alguma coisa no meu computador? Como eu faço para começar?
 
-O Circuitpython é um firmware específico que você vai precisar instalar na sua plaquinha
+O **Circuitpython** é um firmware específico que você vai precisar instalar na sua plaquinha
 de desenvolvimento. Depois disso, ele vai ficar rodando na placa e você vai se comunicar
 com ela utilizando a interface USB do seu computador.
 
@@ -119,7 +127,7 @@ No site da Adafruit você verá que eles indicam o MU https://codewith.mu/
 # Instalando e configurando o Thonny IDE
 
 A instalação é muito simples. Basta fazer o download do arquivo e seguir as etapas de sempre.
-https://github.com/thonny/thonny/releases/download/v4.1.4/thonny-4.1.4.exe
+(https://github.com/thonny/thonny/releases/download/v4.1.4/thonny-4.1.4.exe)
 
 Depois que o Thonny estiver instalado, você vai precisar mexer na sua configuração para ter 
 acesso à porta USB onde a plaquinha está conectada.
