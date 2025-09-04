@@ -97,6 +97,8 @@ while True:
     pixels[pixel] = (color_list[cor]) # acende apenas um led com a cor especificada
     pixels.show()
 ```
+
+## Um dicionário para acessar as cores pelos nomes
 Como você já deve estar pensando, é muito complicado lidar com as cores nesse formato de tuplas numéricas. Nós normalmente chamamos as cores pelos nomes, 
 e seria muito mais interessante se houvesse uma maneira de fazer isso.
 
