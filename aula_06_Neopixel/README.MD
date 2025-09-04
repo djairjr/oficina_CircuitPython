@@ -1,23 +1,37 @@
-# Neopixels e Matrizes de Led RGB
+## Instalando as bibliotecas Neopixel e Adafruit_Simpleio
+Até o momento, nós estamos lidando apenas com os módulos nativos da nossa placa. Não foi preciso fazer a instalação de nenhum módulo adicional. 
+Convencionalmente, nós chamamos esses módulos adicionais para a programação de **bibliotecas (ou libraries)**.
+Nós podemos instalar essas bibliotecas simplesmente copiando os arquivos .py ou .mpy para a pasta lib da sua placa.
+Mas a maneira mais segura de fazer isso é utilizar o gerenciador de pacotes CircUP, da Adafruit.
 
-À medida que os seus projetos vão se tornando mais e mais complexos, os pinos da sua controladora vão escasseando.
-E uma das alternativas mais bacanas que eu encontrei para fazer indicação de status, decoração, e comunicação
-simples foram as fitas de led Neopixel.
+Para instalar esse gerenciador, abra o Thonny e acesse o menu Tools (Ferramentas) >> Open System Shell. 
 
-O melhor guia que eu conheço para começar a mexer com essas fitas é o "The Magic of Neopixels" - https://learn.adafruit.com/adafruit-neopixel-uberguide
+Você deve ver a janela de comandos do seu Windows, com alguma coisa similar a **C:\Users\Usuario\Pasta>**
 
-Lá você vai ter todos os cuidados e observações relevantes. 
+Nesta janela, digite o comando a seguir:
+```
+python -m pip install circup
+```
 
-Vale dizer que as fitas consomem bastante corrente e você vai perceber que em todos os códigos o brilho está definido para 10% apenas.
+Isso deve instalar o gerenciador de pacotes Circup, da Adafruit.
+Agora, vamos instalar duas bibliotecas que vamos utilizar para os próximos exercícios:
 
-Isso é porque a gente está usando a corrente da USB do nosso computador, sem fonte externa. Se você alimentar as fitas led com uma 
-fonte externa, lembre-se de ao menos interligar o pino GND entre a fonte externa e a alimentação via USB da controladora. Você também pode alimentar a sua Raspberry Pi Pico na mesma fonte conectando diretamente os pinos 5V e GND à saída da fonte.
+```
+circup install neopixel, adafruit_simpleio
+```
 
-Os códigos que eu estou compartilhando nesta aula vão ser a matéria inicial da próxima oficina, que vai acontecer no Sesc 24 de maio, a partir do dia 9/05. (https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_6_Neopixel/ArcadeNeoPixel.MD)
+## Neopixels, Listas, Tuplas, Dicionários
+As fitas de Led Neopixel são muito versáteis. Cada led possui um controlador de cores isolado e pode ser acessado individualmente.
+Os leds são ligados em cascata e possuem sempre quatro pinos: VCC e GND, que são os pinos de energia e DI e DO, que são os pinos
+de entrada de dados (DI) e saída de dados (DO). Para criar uma fita de leds, basta conectar os pinos DO de um led ao pino DI de outro.
+O primeiro led vai ser o que tiver o seu pino DI conectado ao controlador.
 
-O desafio da próxima oficina vai ser recriar alguns clássicos dos Arcades usando matrizes de fita led como display. As bibliotecas disponíveis para usar as fitas led como display ainda não dispõem de algumas funcionalidades, então eu estou fazendo as customizações necessárias para a gente poder utilizar como display de jogo.
+Você pode cortar a fita Led e usar pequenos pedaços. Ou montar diversos arranjos diferentes. No mercado, encontramos anéis, matrizes,
+leds individuais.
 
-Serão três "consoles" com alguns jogos: Snake, Minefield e Tetris, inicialmente. Utilizaremos dois painéis de 8x32 Leds, formando um painel de 16x32 para cada um dos jogos. Além disso, vamos trabalhar com o Seeed Xiao RP2040, porque o tamanho reduzido vai fazer diferença na hora de embarcar o projeto. Buzzer, Módulo de Joystick e Display de Sete Segmentos com 4 dígitos finalizam o projeto.
+Eu gosto muito de usar as fitas de Led porque consigo um grande efeito visual usando apenas um pino do meu controlador.
 
-Os arquivos tilegrid.py e tile_framebuf.py são as minhas adaptações de duas bibliotecas da Adafruit. Além disso, estou tentando trabalhar numa versão da biblioteca BMPReader, porque preciso transformar alguns sprites BMP em pixels Neopixel. Estou deixando o código default compartilhado, mas vai ser atualizado à medida que eu for avançando na idéia.
+Nós vamos adaptar a nossa montagem de sempre, só que ao invés de usar um LED, vamos usar uma fita com dez leds diferentes.
+
+
 
