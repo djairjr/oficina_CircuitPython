@@ -1,7 +1,8 @@
 import time, random
 import board, neopixel, rainbowio
-num_leds = 5
-leds = neopixel.NeoPixel(board.GP19, num_leds, brightness=0.4, auto_write=False )
+num_leds = 10
+led_pin = board.D7
+leds = neopixel.NeoPixel(led_pin, num_leds, brightness=0.4, auto_write=False )
 delta_hue = 256//num_leds
 speed = 10  # higher numbers = faster rainbow spinning
 i=0
