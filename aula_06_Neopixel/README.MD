@@ -69,4 +69,33 @@ while True:
     pixels.show()
 ```
 
+Você poderia mapear o potenciômetro e usá-lo para duas coisas distintas. Por exemplo, acender um led específico, com uma cor específica.
+
+```
+import board, time
+import neopixel
+from simpleio import map_range # map_range é a regra de três
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+
+pot = AnalogIn (board.A2)
+botao = DigitalInOut (board.D6)
+
+led_pin = board.D7
+num_led = 10
+brilho = 0.3 # varia de 0 a 1 em décimos
+
+pixels = neopixel.NeoPixel (led_pin, num_led , brightness=brilho, auto_write=False )
+
+# Uma lista de Tuplas, com as cores.
+color_list = [ (10,20,30), (255,0,0), (0,255,0), (0,0,255), (255,255,0), (255,0,255), (0,255,255), (100,100,100), (128, 128, 50), (255,255,255)] 
+
+while True:
+    cor = map_range (pot.value, 0, 65535, 0, 9) # Mapeando para a faixa de cores
+    pixel =  map_range (pot.value, 0, 65535, 0, num_led -1) # Mapeando para a faixa de pixels
+    pixels.fill ((0,0,0)) # Apaga todos os leds
+    pixels[pixel] = (color_list[cor]) # acende apenas um led com a cor especificada
+    pixels.show()
+```
+
 
