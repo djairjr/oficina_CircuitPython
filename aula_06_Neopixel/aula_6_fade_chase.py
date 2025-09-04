@@ -1,7 +1,8 @@
 import time, random
 import board, neopixel
-num_leds = 6
-leds = neopixel.NeoPixel(board.GP19, num_leds, brightness=0.4, auto_write=False )
+num_leds = 10
+led_pin = board.D7 
+leds = neopixel.NeoPixel(led_pin, num_leds, brightness=0.4, auto_write=False )
 my_color = (55,200,230)
 dim_by = 20  # dim amount, higher = shorter tails
 pos = 0
