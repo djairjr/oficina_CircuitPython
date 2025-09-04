@@ -254,11 +254,6 @@ Seja:
 
 Queremos descobrir qual valor na **Faixa Nova** corresponde à mesma "posição proporcional" do `valor_lido` na **Faixa Original**.
 
----
-
-### 📊 **Passo a Passo (como uma regra de três):**
-
-#### 1️⃣ **Qual a proporção do valor na Faixa Original?**
 Imagine uma régua:
 ```
 min ---------------------- valor_lido ---------------------- max
@@ -277,9 +272,7 @@ Se `min=0`, `max=100`, e `valor_lido=50`:
 `proporcao = (50 - 0) / (100 - 0) = 50/100 = 0.5`  
 (ou seja, 50% do caminho na Faixa Original).
 
----
 
-#### 2️⃣ **Aplicar a mesma proporção na Faixa Nova**
 Agora, use essa proporção na **Faixa Nova**:
 ```
 new_min ---------------------- ? ---------------------- new_max
@@ -299,16 +292,10 @@ Se `new_min=10`, `new_max=20`, e `proporcao=0.5`:
 `distancia_nova = 0.5 × 10 = 5`  
 `valor_final = 10 + 5 = 15`
 
----
-
-### ✨ **Fórmula Resumida (Regra de Três):**
 ```
 valor_final = new_min + [(valor_lido - min) / (max - min)] × (new_max - new_min)
 ```
 
----
-
-### 🌰 **Exemplo Prático:**
 Transformar a temperatura de **Celsius para Fahrenheit**:  
 - Faixa Original: `min=0°C`, `max=100°C`  
 - Faixa Nova: `new_min=32°F`, `new_max=212°F`  
@@ -321,16 +308,68 @@ Transformar a temperatura de **Celsius para Fahrenheit**:
 
 *(Nota: Na verdade, 50°C = 122°F! A fórmula funcionou!)*
 
----
-
-### 💡 **Por que isso é útil?**
+**Por que isso é útil?**
 - **Sensores**: Converter leituras de um sensor (ex: 0-1023) para uma faixa útil (ex: 0-100%).  
 - **Gráficos**: Mapear coordenadas de uma tela para outra.  
 - **Jogos**: Ajustar valores de jogo (ex: vida de 0-100 para uma barra de 0-255).  
 
----
-
-### ⚠️ **Atenção!**
+**Atenção!**
 - Se `min == max`, a divisão por zero causa erro. Nesse caso, retorne `new_min` (pois a faixa original é um único ponto).  
 - Valores fora da Faixa Original (ex: menor que `min` ou maior que `max`) serão extrapolados na Faixa Nova. Isso é intencional!
+
+## Criando uma função Python específica para a Regra de Três
+
+Bem, vamos criar uma função em Python, para resolver a nossa regra de três simples.
+
+```
+def regra_de_tres(valor_lido, min_original, max_original, nova_faixa_min, nova_faixa_max):
+    # Evitar divisão por zero se min_original == max_original
+    if min_original == max_original:
+        return nova_faixa_min
+    
+    # Aplicar a fórmula de mapeamento
+    return ((valor_lido - min_original) / (max_original - min_original)) * \
+           (nova_faixa_max - nova_faixa_min) + nova_faixa_min
+
+# Mapear 50 da faixa [0, 100] para a faixa [10, 20]
+print(regra_de_tres(50, 0, 100, 10, 20))  # Saída: 15.0
+
+# Mapear 25 da faixa [-10, 10] para a faixa [0, 100]
+print(regra_de_tres(25, -10, 10, 0, 100))  # Saída: 175.0
+
+```
+Ótimo! Agora sabemos de que jeito é possível mapear um valor na faixa de 0 a 65535 para um valor de 0 a 9, por exemplo.
+
+## Instalando as bibliotecas Neopixel e Adafruit_Simpleio
+Até o momento, nós estamos lidando apenas com os módulos nativos da nossa placa. Não foi preciso fazer a instalação de nenhum módulo adicional. 
+Convencionalmente, nós chamamos esses módulos adicionais para a programação de **bibliotecas (ou libraries)**.
+Nós podemos instalar essas bibliotecas simplesmente copiando os arquivos .py ou .mpy para a pasta lib da sua placa.
+Mas a maneira mais segura de fazer isso é utilizar o gerenciador de pacotes CircUP, da Adafruit.
+
+Para instalar esse gerenciador, abra o Thonny e acesse o menu Tools (Ferramentas) >> Open System Shell. 
+
+Você deve ver a janela de comandos do seu Windows, com alguma coisa similar a **C:\Users\Usuario\Pasta>**
+
+Nesta janela, digite o comando a seguir:
+```
+python -m pip install circup
+```
+
+Isso deve instalar o gerenciador de pacotes Circup, da Adafruit.
+Agora, vamos instalar duas bibliotecas que vamos utilizar para os próximos exercícios:
+
+```
+circup install neopixel, adafruit_simpleio
+```
+
+## Neopixels, Listas, Tuplas, Dicionários
+As fitas de Led Neopixel são muito versáteis. Cada led possui um controlador de cores isolado e pode ser acessado individualmente.
+Os leds são ligados em cascata e possuem sempre quatro pinos: VCC e GND, que são os pinos de energia e DI e DO, que são os pinos
+de entrada de dados (DI) e saída de dados (DO). Para criar uma fita de leds, basta conectar os pinos DO de um led ao pino DI de outro.
+O primeiro led vai ser o que tiver o seu pino DI conectado ao controlador.
+
+Você pode cortar a fita Led e usar pequenos pedaços. Ou montar diversos arranjos diferentes. No mercado, encontramos anéis, matrizes,
+leds individuais.
+
+Eu gosto muito de usar as fitas de Led porque consigo um grande efeito visual usando apenas um pino do meu controlador.
 
