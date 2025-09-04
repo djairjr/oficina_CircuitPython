@@ -9,9 +9,8 @@ import board
 from rainbowio import colorwheel
 import neopixel
 
-# pode ser qualquer pino, mas eu estou ligando nesse por uma razão...
-pixel_pin = board.GP19 
-num_pixels = 6
+pixel_pin = board.D7
+num_pixels = 10
 
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False)
 
@@ -21,5 +20,9 @@ pixels[2] = 0x0000ff
 pixels[3] = 0xffff00
 pixels[4] = 0x00ffff
 pixels[5] = 0xff00ff
+pixels[6] = 0xff0000
+pixels[7] = 0x00ff00
+pixels[8] = 0x0000ff
+pixels[9] = 0xffff00
 pixels.show()
 
