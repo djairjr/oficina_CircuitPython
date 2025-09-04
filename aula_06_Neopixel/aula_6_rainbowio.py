@@ -9,7 +9,7 @@ except:
         if pos < 170: pos -= 85; return (0, 255 - pos * 3, pos * 3)
         pos -= 170; return (pos * 3, 0, 255 - pos * 3)
 
-led = neopixel.NeoPixel(board.GP19, 5, brightness=0.3)
+led = neopixel.NeoPixel(board.D7, 10, brightness=0.3)
 while True:
     led.fill( colorwheel((time.monotonic()*50)%255) )
     time.sleep(0.05)
