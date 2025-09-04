@@ -1,23 +1,28 @@
 # Digital, Analógico, PWM
 
 **Links para Compra da Seeed Xiao RP2040 ou RP2350**
+
 [Plaquinha Seeed Xiao RP2040 na loja oficial](https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html?sensecap_affiliate=TXM32IP&referring_service=link)
 [Kit com três Xiao RP2040](https://www.seeedstudio.com/Seeed-Studio-XIAO-RP2040-3PCS-p-5942.html?sensecap_affiliate=TXM32IP&referring_service=link)
 [Plaquinha Seeed Xiao RP2350 - equivale a Pico 2](https://www.seeedstudio.com/Seeed-XIAO-RP2350-p-5944.html?sensecap_affiliate=TXM32IP&referring_service=link)
 
 Procurem a versão **Pre-Soldered**, porque já vem com os pinos todos soldados.
+
 [Loja no AliExpress](https://seeedstudio.aliexpress.com/store/1103741821?spm=a2g0o.detail.0.0.3f5crJUrrJUrzd)
 
 **Links para Compra da Raspberry Pi Pico RP2040 ou RP2350**
+
 [Raspberry Pi Pico na Maker Hero](https://www.makerhero.com/produto/raspberry-pi-pico/)
 [Raspberry Pi Pico 2 na Maker Hero](https://www.makerhero.com/produto/raspberry-pi-pico-2/)
 [Raspberry Pi Pico W (com Wifi)](https://www.makerhero.com/produto/raspberry-pi-pico-w/)
 [Raspberry Pi Pico 2W (com Wifi)](https://www.makerhero.com/produto/raspberry-pi-pico-2-w/)
 
 **Links para Compra da Franzininho Wifi - ESP32 S2 que roda CircuitPython**
+
 [Franzininho Wifi ESP32-S2 - Placa nacional com wifi integrado](https://www.robocore.net/wifi/franzininho-wifi)
 
 ## Pinagem da Seeed Xiao RP2040
+
 Todo dispositivo eletrônico que vocÊ for utilizar terá um manual técnico chamado de **datasheet**.
 No CircuitPython, o módulo board é uma interface que permite que você acesse os pinos da plaquinha que você está utilizando com os mesmos nomes que você lê no **datasheet** do fabricante. Isso parece óbvio, mas nem sempre isso é feito em todas as linguagens. Para acessar qualquer um dos pinos indicados no diagrama abaixo, você vai precisar importar o módulo board e em seguida, identificar o pino com o nome board.PINO
 
