@@ -32,6 +32,6 @@ leds individuais.
 Eu gosto muito de usar as fitas de Led porque consigo um grande efeito visual usando apenas um pino do meu controlador.
 
 Nós vamos adaptar a nossa montagem de sempre, só que ao invés de usar um LED, vamos usar uma fita com dez leds diferentes.
-
+![Montagem com Fitas Led Neopixel](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_06_Neopixel/Diagrama%20Aula%204_bb.png)
 
 
