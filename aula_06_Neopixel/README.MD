@@ -42,7 +42,10 @@ e Dicionários, que são conjuntos de informações que podem ser modificadas, m
 
 A biblioteca Neopixel do Circuitpython faz com que cada um dos leds da fita seja um elemento dentro de uma lista. Cada um desses elementos pode receber um valor na forma de uma tupla, que vai conter as cores no formato (Red, Green, Blue) com Red, Green e Blue variando entre 0 e 255.
 
-No exercício a seguir, vamos criar uma lista com cores e aplicar as cores à medida em que giramos o potenciômetro.
+## Mudando as cores da fita inteira
+
+No exercício a seguir, vamos criar uma lista com cores e aplicar as cores à fita inteira, usando o método fill().
+O potenciômetro vai trocar a cor da fita à medida em que for girado.
 
 ```
 import board, time
