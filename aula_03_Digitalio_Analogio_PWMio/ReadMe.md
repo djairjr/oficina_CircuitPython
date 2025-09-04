@@ -44,7 +44,7 @@ led_pin = board.D7
 
 ## Módulos digitalio e analogio
 O código do exemplo acima ainda não faz nada com os pinos da nossa plaquinha. Os microcontroladores possuem pinos chamados GPIO, sigla que significa Generic Pin Input Output.
-Os pinos servem tanto para entrada como para saída. Nós precisamos indicar o que queremos fazer com esses pinos. No caso da Xiao, temos quatro pinos especiais, que podem ser configurados como analógicos ou digitais. São os pinos A0~A3, que também são os pinos D0~D3. No caso específico dos microcontroladores RP2040 e RP2350, nós não temos nenhuma saída do tipo analógica, apenas as entradas.
+Os pinos servem tanto para entrada como para saída. Nós precisamos indicar o que queremos fazer com esses pinos. No caso da Xiao, temos quatro pinos especiais, que podem ser configurados como analógicos ou digitais. São os pinos A0-A3, que também são os pinos D0-D3. No caso específico dos microcontroladores RP2040 e RP2350, nós não temos nenhuma saída do tipo analógica, apenas as entradas.
 Apesar disso, o módulo que lida com as entradas analógicas é o **Analogio** e o que lida com as entradas e saídas digitais é o **Digitalio**.
 No código a seguir, nós iremos importar o módulo board para endereçar os pinos da mesma maneira que lemos no diagrama do fabricante e em seguida, vamos importar os módulos digitalio e analogio para poder tratar as entradas e saídas digitais (botão e Led) e a entrada analógica (Potenciômetro).
 ```
