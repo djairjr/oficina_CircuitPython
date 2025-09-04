@@ -1,5 +1,7 @@
 """
 Exemplo com a adafruit_led_animation
+lembre-se de instalar com
+circup install adafruit_led_animation
 Confira mais coisas legais aqui:https://learn.adafruit.com/circuitpython-led-animations?view=all
 """
 import board
@@ -10,8 +12,8 @@ from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation.color import PURPLE, AMBER, JADE
 
-pixel_pin = board.D10
-pixel_num = 6
+pixel_pin = board.D7
+pixel_num = 10
 
 pixels = neopixel.NeoPixel(pixel_pin, pixel_num, brightness=0.5, auto_write=False)
 
