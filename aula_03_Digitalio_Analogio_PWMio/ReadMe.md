@@ -1,209 +1,325 @@
-### **Explicação Simplificada para Leigos - CircuitPython no Seeed Xiao RP2040**
+# Digital, Analógico, PWM
 
-**Link para Compra da Seeed Xiao RP2040 ou RP2350**
-
+**Links para Compra da Seeed Xiao RP2040 ou RP2350**
 [Plaquinha Seeed Xiao RP2040 na loja oficial](https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html?sensecap_affiliate=TXM32IP&referring_service=link)
-
 [Kit com três Xiao RP2040](https://www.seeedstudio.com/Seeed-Studio-XIAO-RP2040-3PCS-p-5942.html?sensecap_affiliate=TXM32IP&referring_service=link)
-
 [Plaquinha Seeed Xiao RP2350 - equivale a Pico 2](https://www.seeedstudio.com/Seeed-XIAO-RP2350-p-5944.html?sensecap_affiliate=TXM32IP&referring_service=link)
 
 Procurem a versão **Pre-Soldered**, porque já vem com os pinos todos soldados.
 [Loja no AliExpress](https://seeedstudio.aliexpress.com/store/1103741821?spm=a2g0o.detail.0.0.3f5crJUrrJUrzd)
 
+**Links para Compra da Raspberry Pi Pico RP2040 ou RP2350**
+[Raspberry Pi Pico na Maker Hero](https://www.makerhero.com/produto/raspberry-pi-pico/)
+[Raspberry Pi Pico 2 na Maker Hero](https://www.makerhero.com/produto/raspberry-pi-pico-2/)
+[Raspberry Pi Pico W (com Wifi)](https://www.makerhero.com/produto/raspberry-pi-pico-w/)
+[Raspberry Pi Pico 2W (com Wifi)](https://www.makerhero.com/produto/raspberry-pi-pico-2-w/)
 
-#### **1. Conceitos Fundamentais**
-**Sinais Digitais vs Analógicos**
-- **Digital**: Valores exatos (0 ou 1) - como um interruptor de luz
-- **Analógico**: Variação contínua ampla faixa de valores - como um dimmer de luz
+**Links para Compra da Franzininho Wifi - ESP32 S2 que roda CircuitPython**
+[Franzininho Wifi ESP32-S2 - Placa nacional com wifi integrado](https://www.robocore.net/wifi/franzininho-wifi)
 
-#### **2. Componentes da Experiência**
-![Pinagem do Seeed Xiao RP2040](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Seeedstudio-Seeeduino-XIAO-RP2040-Microcontroller-Board-Pinout-Diagram-1-1536x1046.jpg)
+## Pinagem da Seeed Xiao RP2040
+Todo dispositivo eletrônico que vocÊ for utilizar terá um manual técnico chamado de **datasheet**.
+No CircuitPython, o módulo board é uma interface que permite que você acesse os pinos da plaquinha que você está utilizando com os mesmos nomes que você lê no **datasheet** do fabricante. Isso parece óbvio, mas nem sempre isso é feito em todas as linguagens. Para acessar qualquer um dos pinos indicados no diagrama abaixo, você vai precisar importar o módulo board e em seguida, identificar o pino com o nome board.PINO
 
-![Montagem da Aula](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Montagem_Aula_3.png)
+![Datasheet da Xiao RP2040](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Seeedstudio-Seeeduino-XIAO-RP2040-Microcontroller-Board-Pinout-Diagram-1-1536x1046.jpg?raw=true)
 
-**Botão (Digital)**
-- Apertado = 0 / Solto = 1
-- Exemplo: interruptor simples
-```
-import board # Módulo que faz a interface entre o Circuitpython e os nomes dos pinos na plaquinha
-import digitalio # Módulo que cuida das entradas e saídas digitais
-from digitalio import DigitalInOut, Direction, Pull # ou você pode importar somente aquilo que vai usar
-
-led = DigitalInOut (board.D7) # Indica que a variável led vai representar uma entrada ou saída digital no pino D7 da placa
-
-led.direction = Direction.OUTPUT # Determina que a variável led vai representar especificamente uma saída digital
-led.value = False # Atribui o valor False (Zero) ao led, fazendo com que ele apague.
-
-botao = DigitalInOut (board.D6) # Indica que a variavel botao vai representar uma entrada ou saída digital no pino D6 da placa
-botao.direction = Direction.INPUT # Determina que a variável botão vai representar específicamente uma entrada digital
-botao.pull = Pull.UP # Determina que, quando o botão não estiver sendo pressionado, o valor dele será UP (True).
-
-print (botao.value) # deve exibir True, se o botão não estiver pressionado e False, se estiver.
-
-while True: # crio um loop infinito
-  if botao.value == False:  # Se o botão estiver pressionado
-    print ('Botão Pressionado')
-    led.value = True # Acende o Led
-  else:
-    led.value = False # Apaga o Led
-```
-
-**Potenciômetro (Analógico)**
-- Gira → varia tensão (0V a 3.3V)
-- Exemplo: controle de volume ou de intensidade. Controle de direção (Joystick Analógico)
-
-```
-# Lê o valor de tensão no pino analógico
-
-import time, board
-from analogio import AnalogIn
-
-potenciometro = AnalogIn (board.A2)
-
-# Criando uma função com def
-def get_voltage (pin):
-  # pin.value vai retornar um valor entre 0 e 65536. 
-  # 3.3 é a tensão máxima.
-  return (pin.value * 3.3) / 65536
-
-while True:
-  print (get_voltage (potenciometro)) # Usando a minha função definida
-  time.sleep (0.1)
-```
-**PWM (Modulação por Largura de Pulso)**
-- "Engana" criando efeito analógico com digital
-- Controla brilho do LED variando tempo ligado/desligado
-
-**LED com PWM**
-- Brilho controlado por pulsos rápidos
-- Exemplo: dimmer digital
-
-```
-import time, board
-from digitalio import DigitalInOut, Pull, Direction
-from analogio import AnalogIn # Somente para ler o potenciometro
-
-led = DigitalInOut (board.D7) # Se quiser usar os Leds da plaquinha board.LED
-led.direction = Direction.OUTPUT
-
-potenciometro = AnalogIn (board.A2)
-
-# Frequência é medida em Hertz. Indica a quantidade de ciclos de um evento por segundo
-# Nós estamos considerando como ciclo, o tempo em que o LED acende e apaga.
-
-frequencia = 60 
-periodo_total = 1 / frequencia
-
-# Nosso sistema vai perguntar para o usuário, qual a intensidade do Led.
-# Se você optar por usar o potenciômetro, vai precisar calcular duty_cicle usando
-# uma leitura analógica do potenciômetro e a função get_voltage modificada
-# para encontrar uma porcentagem
-duty_cicle = int (input ( 'Digite a intensidade do LED em porcentagem (0 a 100%: )')) / 100
-
-# duty_cycle = descubra um jeito de usar o valor do potenciometro e convertê-lo em porcentagem
-
-# Ele vai fazer um cálculo, subtraindo o tempo total do ciclo (1), do tempo em que o ciclo
-# está ativo (duty_cicle) e com isso, vai encontrar o tempo em que o led fica inativo.
-inactive_time = 1 - duty_cicle
-
-# Modifique essa função para que retorne um valor em porcentagem
-def get_voltage (pin):
-  # pin.value vai retornar um valor entre 0 e 65536. 
-  # 3.3 é a tensão máxima. E se quiséssemos o valor em porcentagem? De 0.0 a 1.0, por exemplo?
-  return (pin.value * 3.3) / 65536 # Você vai precisar mudar alguma coisa nessa linha aqui...
-
-while True: # Esse é o nosso loop principal
-  led.value = True # Acende o Led
-  time.sleep (duty_cicle * periodo_total) # Espera o tempo de led ativo
-  led.value = False # Apaga o Led
-  time.sleep (inactive_time * periodo_total) # Espera o tempo de led inativo e volta pro começo do loop
-
-# No código acima, como você faria para usar o potenciômetro para alterar a intensidade do brilho do led?
-# Dica: ao invés de perguntar para o usuário antes do loop, você pode fazer a leitura analógica
-# do potenciômetro e usar matemática para definir os valores de duty_cicle e inactive_time
-# Que tal usar a função get_voltage e convertê-la para usar porcentagens, ao invés de tensões?
-# Qual a diferença entre colocar a leitura do potenciômetro dentro do loop principal ou fora dele?
-```
-#### **3. Usando saídas em PWM do RP2040**
-O RP2040 possui diversas saídas PWM. Neste caso, não precisamos fazer todo o cálculo do duty_cicle.
-Nós podemos usar uma biblioteca, a pwmio, para cuidar disso para nós. No exemplo abaixo, vamos descobrir
-quais são os pinos do Xiao que podem ser usados como saída PWM.
-
+Na nossa montagem de aula, vamos ligar um botão como entrada no pino D6 e um LED como saída no pino D7. Nós podemos criar duas variáveis e indicar isso, por exemplo.
 ```
 import board
-import pwmio
-
-for pin_name in dir(board): # Quais são os pinos do RP2040 que são PWM?
-    pin = getattr(board, pin_name)
-    try:
-        p = pwmio.PWMOut(pin)
-        p.deinit()
-        print("PWM on:", pin_name)  # Prints the valid, PWM-capable pins!
-    except ValueError:  # This is the error returned when the pin is invalid.
-        print("No PWM on:", pin_name)  # Prints the invalid pins.
-    except RuntimeError:  # Timer conflict error.
-        print("Timers in use:", pin_name)  # Prints the timer conflict pins.
-    except TypeError:  # Error returned when checking a non-pin object in dir(board).
-        pass  # Passes over non-pin objects in dir(board).
+botao_pin = board.D6
+led_pin = board.D7
 ```
+![Diagrama de Montagem da Aula](https://github.com/djairjr/oficina_CircuitPython/raw/main/aula_03_Digitalio_Analogio_PWMio/Montagem_Aula_3.png)
 
-No exemplo abaixo, vamos fazer o led piscar, com efeito de fade...
-
+## Módulos digitalio e analogio
+O código do exemplo acima ainda não faz nada com os pinos da nossa plaquinha. Os microcontroladores possuem pinos chamados GPIO, sigla que significa Generic Pin Input Output.
+Os pinos servem tanto para entrada como para saída. Nós precisamos indicar o que queremos fazer com esses pinos. No caso da Xiao, temos quatro pinos especiais, que podem ser configurados como analógicos ou digitais. São os pinos A0~A3, que também são os pinos D0~D3. No caso específico dos microcontroladores RP2040 e RP2350, nós não temos nenhuma saída do tipo analógica, apenas as entradas.
+Apesar disso, o módulo que lida com as entradas analógicas é o **Analogio** e o que lida com as entradas e saídas digitais é o **Digitalio**.
+No código a seguir, nós iremos importar o módulo board para endereçar os pinos da mesma maneira que lemos no diagrama do fabricante e em seguida, vamos importar os módulos digitalio e analogio para poder tratar as entradas e saídas digitais (botão e Led) e a entrada analógica (Potenciômetro).
 ```
-import time, pwmio, board
-led = pwmio.PWMOut (board.LED, frequency=5000, duty_cycle=0)
+import board
+
+# Lembrando que a gente pode importar todos objetos da módulo com
+# import digitalio
+# ou podemos importar somente as coisas que iremos utilizar (o que economiza memória e facilita a chamada)
+
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+
+botao = DigitalInOut (board.D6) # com o comando >>> import digitalio, seria botao = digitalio.DigitalInOut (board.D6)
+led = DigitalInOut (board.D7) # Botao e Led são objetos, do tipo DigitalInOut
+pot = AnalogIn (board.A2) # Pot é um objeto do tipo AnalogIn
+
+# Com isso, nós temos as definições de que pinos serão analógicos e digitais.
+led.direction = Direction.OUTPUT # digo ao circuitpython que meu led é uma saída.
+botao.direction = Direction.INPUT # digo a ele que meu botão é uma entrada
+
+# Quando o botão não estiver sendo pressionado, não tenho nenhuma garantia de que o nível dele vai ser Alto ou Baixo.
+# No nosso circuito, nós fizemos uma ligação no botão que quando ele for pressionado vai acionar nível baixo. Mas não há nada
+# ligado nele que garanta outro nível. Isso pode gerar falsos acionamentos. Para não fazer outra ligação e usar outro componente,
+# nós usamos PULL
+
+botao.pull = Pull.UP # indicando que, quando a entrada não receber nenhum sinal, nós vamos assumir que ela está em nível ALTO 
+```
+O código acima prepara as entradas e saídas do nosso sistema para funcionarem da maneira que esperamos. Mas ainda não dissemos a ele o que fazer com elas.
+
+## Primeiro desafio: Acenda o Led quando o Botão for Pressionado
+Nós agora vamos aproveitar toda a inicialização do código anterior, mas vamos adicionar a funcionalidade de acender o led quando o botão for pressionado.
+Digite (ou copie e cole) o código abaixo e tente executá-lo no Thonny.
+```
+import board
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+
+botao = DigitalInOut (board.D6)
+led = DigitalInOut (board.D7)
+pot = AnalogIn (board.A2)
+
+led.direction = Direction.OUTPUT
+botao.direction = Direction.INPUT
+
+botao.pull = Pull.UP
+
+# Loop Principal
+# Executa até que vc pressione CTRL+C ou STOP, no Thonny
+
 while True:
-    for i in range(100):
-        # PWM LED up and down
-        if i < 50:
-            led.duty_cycle = int(i * 2 * 65535 / 100)  # Up
-        else:
-            led.duty_cycle = 65535 - int((i - 50) * 2 * 65535 / 100)  # Down
-        time.sleep(0.01)
+    # Se o valor do botão for Zero,
+    if botao.value == False:
+        led.value = True
+    else:
+        led.value = False
+```
+Digamos agora que nós queremos mudar apenas o Loop principal, mudando a funcionalidade do nosso botão.
+Se o botão estiver pressionado, nós queremos que o nosso led fique piscando a cada 0.2s. Como fazemos?
+Antes de tudo, temos que importar o módulo time, que cuida dos intervalos de tempo.
+```
+import board
+import time # para lidar com os intervalos
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+
+botao = DigitalInOut (board.D6)
+led = DigitalInOut (board.D7)
+pot = AnalogIn (board.A2)
+
+led.direction = Direction.OUTPUT
+botao.direction = Direction.INPUT
+
+botao.pull = Pull.UP
+
+# Loop Principal
+# Executa até que vc pressione CTRL+C ou STOP, no Thonny
+
+while True:
+    # Se o valor do botão for Zero,
+    if botao.value == False:
+        led.value = not led.value # O que é isso?
+        time.sleep(0.2)
+    else:
+        led.value = False
+```
+Veja que o código acima tem uma linha muito maluca: 
+led.value = not led.value
+
+O que quer dizer isso?
+O Circuitpython vai atribuir um valor à propriedade led.value que vai ser o contrário do valor atual dessa propriedade.
+Assim, se o valor atual da propriedade value, do objeto led for False, ele vai atribuir um valor True. E vice-versa.
+
+Nós poderíamos escrever outro código para o loop principal que faz a mesma função:
+```
+# Somente o loop principal, não esqueça do código anterior...
+while True:
+    # Se o valor do botão for Zero,
+    if botao.value == False:
+        led.value = True # Acende
+        time.sleep(0.2) # Espera
+        led.value = False # Apaga
+        time.sleep(0.2) # Espera
+    else:
+        led.value = False
+```
+E se nós quiséssemos manter o led piscando, enquanto o botão não for pressionado? E quando o botão fosse pressionado, o led apagasse
+e o programa termina?
+
+```
+# Como nós dissemos antes que o botão vai estar em nível alto se não for pressionado
+# o loop a seguir fica rodando até que a gente pressione o botão, caso em que ele recebe o valor False
+
+while botao.value == True:
+    led.value = not led.value
+    time.sleep(0.2) # Que tal se você diminuir bastante esse valor aqui? Quando você chegar perto de 0.04 vai ver uma coisa estranha...
+
+led.value = False
+print ('Terminei tudo') # Só pra gente ver que o programa chegou aqui
+```
+## Segundo desafio: imprimir o valor da entrada analógica
+No segundo exercício, nós vamos imprimir o valor da entrada analógica. 
+Digite o código abaixo e execute. Varie o valor do potenciometro girando-o e anote os valores mínimo e máximo.
+
+```
+# O começo do nosso código é sempre o mesmo:
+import board, time
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+
+# Nós não vamos usar botão e led por enquanto, mas deixe eles aqui
+botao = DigitalInOut (board.D6)
+led = DigitalInOut (board.D7)
+
+# Essa é a estrela do momento...
+pot = AnalogIn (board.A2)
+
+# Não vamos fazer nada com eles, por enquanto
+led.direction = Direction.OUTPUT
+botao.direction = Direction.INPUT
+
+botao.pull = Pull.UP
+
+while True:
+    print (pot.value)
+    time.sleep(0.5)
+
+```
+Se tudo correu bem na montagem, o valor do potenciômetro deve estar na faixa de 0 a 65535. Porque esses números?
+Na Raspberry Pi Pico, as saídas analógicas possuem uma resolução de 16 bits. Um bit é uma unidade binária que pode ter valores entre 0 e 1 (dois valores).
+Se nós temos uma resolução de 16 bits, significa que nós temos 2^16 combinações possíveis entre 0 e 1, o que dá 65536 valores.
+
+Claro, como seu potenciômetro tem uma tolerência (às vezes 1%, 2% e até 10%), pode ser que os valores obtidos no seu código não sejam exatamente esses.
+
+A essa altura, você deve estar se perguntando se poderia usar o potenciômetro para mudar o brilho do LED. A resposta é sim.
+
+Vamos fazer uma experiência com esse código:
+
+```
+import board, time
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+
+while True:
+    # Se o valor do botão for Zero,
+    if botao.value == False:
+        led.value = not led.value # O que é isso?
+        time.sleep(0.2) # diminua esse valor gradativamente até 0.04
+    else:
+        led.value = False
+```
+O que acontece com Led quando time.sleep(0.04) ?
+Parece que ele está acendendo mais fraco e não apaga mais.
+Na realidade, ele está acendendo e apagando tão rápido, que a nossa visão não capta. Então temos a percepção de que ele está meio apagado.
+
+Essa abordagem é chamada de Modulação Por Comprimento do Pulso, ou em inglês PWM. É uma maneira de usar um sinal digital para simular uma saída analógica.
+Isso é usado para tocar sons, diminuir a intensidade e a velocidade de dispositivos e até enviar comandos de direção, no caso dos servo-motores.
+
+Em CircuitPython, nós temos um módulo nativo para lidar com esse tipo de sinal. É o PWMio.
+
+O código abaixo altera o brilho do Led, conforme você gira o potenciômetro.
+
+```
+import board, time
+from digitalio import DigitalInOut, Direction, Pull
+from analogio import AnalogIn
+from pwmio import PWMOut
+
+led = PWMOut (board.D7, frequency=5000, duty_cycle=0)
+pot = AnalogIn (board.A2)
+
+while True:
+    led.duty_cycle = pot.value
+
+```
+Como led.duty_cicle também varia entre 0 e 65535, nós não precisamos fazer nenhum tratamento dos valores recebidos pelo potenciômetro. 
+Basta copiar o valor pot.value para a propriedade led.duty_cycle e pronto!
+
+Mas algumas vezes, precisamos lidar com o potenciômetro para fazer a variação entre valores diferentes dos que são obtidos na entrada analógica.
+Por exemplo, no Joystick que vamos utilizar, os eixos X e Y do movimento são obtidos por dois potenciômetros. Como é que transformamos isso em
+valores de movimento? Em alguns casos, queremos usar o potenciômetro para alterar valores na faixa de 0 a 100, por exemplo. Como fazemos isso?
+
+### **Usando Regra de Três Simples:**
+Seja:
+- **Faixa Original**: de `min` até `max`
+- **Faixa Nova**: de `new_min` até `new_max`
+- **Valor a transformar**: `valor_lido`
+
+Queremos descobrir qual valor na **Faixa Nova** corresponde à mesma "posição proporcional" do `valor_lido` na **Faixa Original**.
+
+---
+
+### 📊 **Passo a Passo (como uma regra de três):**
+
+#### 1️⃣ **Qual a proporção do valor na Faixa Original?**
+Imagine uma régua:
+```
+min ---------------------- valor_lido ---------------------- max
+```
+A distância do `min` até o `valor_lido` é:  
+`distancia_original = valor_lido - min`
+
+O tamanho total da Faixa Original é:  
+`tamanho_original = max - min`
+
+Então, a **proporção** do `valor_lido` na Faixa Original é:  
+`proporcao = distancia_original / tamanho_original`
+
+Exemplo:  
+Se `min=0`, `max=100`, e `valor_lido=50`:  
+`proporcao = (50 - 0) / (100 - 0) = 50/100 = 0.5`  
+(ou seja, 50% do caminho na Faixa Original).
+
+---
+
+#### 2️⃣ **Aplicar a mesma proporção na Faixa Nova**
+Agora, use essa proporção na **Faixa Nova**:
+```
+new_min ---------------------- ? ---------------------- new_max
+```
+O tamanho total da Faixa Nova é:  
+`tamanho_novo = new_max - new_min`
+
+Multiplicamos a proporção pelo tamanho novo:  
+`distancia_nova = proporcao × tamanho_novo`
+
+E adicionamos ao `new_min` para encontrar o valor final:  
+`valor_final = new_min + distancia_nova`
+
+Exemplo:  
+Se `new_min=10`, `new_max=20`, e `proporcao=0.5`:  
+`tamanho_novo = 20 - 10 = 10`  
+`distancia_nova = 0.5 × 10 = 5`  
+`valor_final = 10 + 5 = 15`
+
+---
+
+### ✨ **Fórmula Resumida (Regra de Três):**
+```
+valor_final = new_min + [(valor_lido - min) / (max - min)] × (new_max - new_min)
 ```
 
+---
 
-#### **4. Conversores (Conceitos Importantes)**
-**ADC (Conversor Analógico-Digital)**
-- Transforma tensão do potenciômetro em números (0-65535)
-- Isso é algo que já está implementado na Xiao, nos pinos A0, A1, A2, A3
-- Funciona assim, o sistema lê os valores de tensão nesses pinos e os converte numa faixa de valores de 0 a 65535.
-  - 0V → 0
-  - 1.65V → 32768
-  - 3.3V → 65535
+### 🌰 **Exemplo Prático:**
+Transformar a temperatura de **Celsius para Fahrenheit**:  
+- Faixa Original: `min=0°C`, `max=100°C`  
+- Faixa Nova: `new_min=32°F`, `new_max=212°F`  
+- Valor: `valor_lido=50°C`
 
-**DAC (Conversor Digital-Analógico) - Conceito Geral**
-- Faz o inverso do ADC: transforma números em tensão analógica
-- Exemplo de uso:
-  - Gerar sinais de áudio
-  - Controlar motores com precisão
-- *Observação: Nosso Xiao RP2040 não tem DAC, mas é importante conhecer o conceito*
+**Cálculo:**  
+1. Proporção: `(50 - 0) / (100 - 0) = 0.5`  
+2. Distância na Faixa Nova: `0.5 × (212 - 32) = 0.5 × 180 = 90`  
+3. Valor Final: `32 + 90 = 122°F`  
 
+*(Nota: Na verdade, 50°C = 122°F! A fórmula funcionou!)*
 
-#### **5. Fluxo Completo (Nosso Projeto)**
-1. Potenciômetro gera tensão analógica
-2. ADC converte para número digital
-3. Número é usado no PWM para controlar LED
-4. LED brilha conforme posição do potenciômetro
+---
 
-### **Comparação Didática**
-| Dispositivo | Entrada | Saída | Analogia |
-|-------------|---------|-------|----------|
-| ADC | Tensão (0-3.3V) | Número (0-65535) | Tradutor de voltagem para números |
-| DAC* | Número | Tensão | Tradutor de números para voltagem |
-| PWM | Número | Pulsos digitais | Dimmer digital |
+### 💡 **Por que isso é útil?**
+- **Sensores**: Converter leituras de um sensor (ex: 0-1023) para uma faixa útil (ex: 0-100%).  
+- **Gráficos**: Mapear coordenadas de uma tela para outra.  
+- **Jogos**: Ajustar valores de jogo (ex: vida de 0-100 para uma barra de 0-255).  
 
-*Conceito geral (não presente no nosso hardware)
+---
 
-### **Por Que Isso Importa?**
-Entender esses conceitos ajuda a:
-- Ler sensores analógicos (como o potenciômetro)
-- Controlar dispositivos com precisão
-- Compreender como dispositivos eletrônicos conversam entre si
+### ⚠️ **Atenção!**
+- Se `min == max`, a divisão por zero causa erro. Nesse caso, retorne `new_min` (pois a faixa original é um único ponto).  
+- Valores fora da Faixa Original (ex: menor que `min` ou maior que `max`) serão extrapolados na Faixa Nova. Isso é intencional!
 
-### **Lembrete Importante**
-No Seeed Xiao RP2040:
-- Temos ADC para ler o potenciômetro
-- Usamos PWM para controlar o LED
-- **Não temos DAC** - é apenas um conceito importante para conhecer
