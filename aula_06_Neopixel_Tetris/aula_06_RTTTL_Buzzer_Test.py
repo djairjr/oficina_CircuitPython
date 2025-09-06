@@ -16,5 +16,5 @@ for line in fileHandle:
 fileHandle.close()
 
 for song in songs:
-    adafruit_rtttl.play(board.A3, song)
+    adafruit_rtttl.play(board.D7, song)
     time.sleep(1)
