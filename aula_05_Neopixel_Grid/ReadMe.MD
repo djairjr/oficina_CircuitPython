@@ -5,16 +5,23 @@ Vou padronizar a montagem do nosso sistema para que nós sigamos a pinagem da [L
 Essa placa possui drivers de corrente que permitem que a nossa matriz de Leds funcione em brilho máximo.
 
 Para essa placa, as conexões vão ser as seguintes:
+
 Tela Neopixel
+
 Matriz = board.A0 (Energizada com 5V)
 
 Os módulos abaixo, serão energizados com 3.3V:
+
 Joystick
+
 Eixo X = board.A1
+
 Eixo Y = board.A2
+
 Botão  = board.D6
 
 Som
+
 Buzzer = board.D7
 
 
