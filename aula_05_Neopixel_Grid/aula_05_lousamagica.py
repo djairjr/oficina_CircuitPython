@@ -1,43 +1,35 @@
-# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams, written for Adafruit Industries
-# SPDX-License-Identifier: MIT
-"""
-This example runs on an Seeed Xiao RP2040
-"""
-import board, time, os
+import board, time
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
-import neopixel_spi as neopixel
+import neopixel
 from rainbowio import colorwheel
-import framebufferio
+
 import adafruit_rtttl
+from adafruit_pixel_framebuf import PixelFramebuffer
 
-# My custom version
-from tile_framebuf import TileFramebuffer
-spi = board.SPI()
+pixel_pin = board.A0
+pixel_width = 16
+pixel_height = 16
+num_tiles = 1
 
-pixel_pin = board.D10
-pixel_width = 32
-pixel_height = 8
-num_tiles = 2
+joystick_x = AnalogIn(board.A1)
+joystick_y = AnalogIn(board.A2)
 
-joystick_x = AnalogIn(board.A0)
-joystick_y = AnalogIn(board.A1)
-
-trigger = DigitalInOut (board.D2)
+trigger = DigitalInOut (board.D6)
 trigger.direction = Direction.INPUT
 trigger.pull = Pull.UP
 
-buzzer = board.D3
+buzzer = board.D7
 
-pixels = neopixel.NeoPixel_SPI(
-    spi,
+pixels = neopixel.NeoPixel(
+    pixel_pin,
     pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
     brightness=0.1,
     auto_write=False,
 )
 
-screen = TileFramebuffer(
+screen = PixelFramebuffer(
     pixels,
     pixel_width,
     pixel_height,

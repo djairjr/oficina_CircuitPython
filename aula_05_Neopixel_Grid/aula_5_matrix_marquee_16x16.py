@@ -6,19 +6,15 @@ from adafruit_bitmap_font import bitmap_font
 from displayio import Bitmap
 from rainbowio import colorwheel
 import terminalio
-# My custom version
-from tile_framebuf import TileFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer
 
 #Trying to speed up stuff...
 from ulab import numpy as np
 
-
-spi = board.SPI()
-
-pixel_pin = board.D10
-pixel_width = 32
-pixel_height = 8
-num_tiles = 2
+pixel_pin = board.A0
+pixel_width = 16
+pixel_height = 16
+num_tiles = 1
 num_pixels = pixel_width * pixel_height * num_tiles
 
 # Y offset, from the top of the display
@@ -26,24 +22,24 @@ offset = 4
 # whether to mirror horizontally (test both values)
 upside_down = True
 
-pixels = neopixel.NeoPixel_SPI(
-    spi,
+pixels = neopixel.NeoPixel(
+    pixel_pin,
     pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
-    brightness=0.5,
+    brightness=0.2,
     auto_write=False,
 )
 
-screen = TileFramebuffer(
+screen = PixelFramebuffer(
     pixels,
     pixel_width,
     pixel_height,
     num_tiles,
-    rotation = 2
+    rotation = 0
 )
 
 
 font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
-label = Label(text="Seeed Xiao with Neopixel Matrix     ", font=font, scale=2)
+label = Label(text="Sesc Av. Paulista     ", font=font, scale=2)
 bitmap = label.bitmap
 
 colors = [0, 0]
