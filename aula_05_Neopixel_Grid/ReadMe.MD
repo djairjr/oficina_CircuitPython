@@ -20,7 +20,7 @@ Eixo Y = board.A2
 
 Botão  = board.D6
 
-**Som
+**Som**
 
 Buzzer = board.D7
 
