@@ -471,13 +471,16 @@ while True:
         new_head in snake_body
     ):
 		# Se isso acontece, volta para a condição inicial.
+		# Que é a serpente com 3 pixels de comprimento no meio da tela
         snake_body = [
             [pixel_height // 2, pixel_width // 2],
             [pixel_height // 2, pixel_width // 2 - 1],
             [pixel_height // 2, pixel_width // 2 - 2]
         ]
     else:
-        snake_body.insert(0, new_head)
+	    # Senão, desenha a nova cabeça na primeira posição do corpo
+		# lembrando que snake_body[0] é a cabeça atual
+        snake_body.insert(0, new_head) # insere na posição 0 do corpo a nova cabeça
 
         # Se a serpente comeu a comida, gera nova comida
         if snake_body[0] == food: #snake_body[0] é a cabeça
@@ -485,14 +488,14 @@ while True:
         else:
             snake_body.pop()
 
-        # Clear screen and draw
+        # Sempre limpa a tela antes de desenhar o novo quadro
         screen.fill(0)
         
-        # Draw snake head and body
+        # Desenha a cabeça da serpente e o corpo
         for segment in snake_body:
             screen.pixel(segment[1], segment[0], 0x00FF00)  # Snake
         
-        # Draw Food
+        # Desenha a comida
         screen.pixel(food[1], food[0], 0xFF0000)
         
         # Show everything
