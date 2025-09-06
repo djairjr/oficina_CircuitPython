@@ -43,7 +43,6 @@ def moveSound():
 def deleteSound():
     adafruit_rtttl.play (buzzer, "delete:d=4,o=5,b=330:8c6,8d6")
 
-
 def get_joystick():
     # Returns -1 0 or 1 depending on joystick position
     x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
