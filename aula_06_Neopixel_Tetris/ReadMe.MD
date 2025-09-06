@@ -17,6 +17,62 @@ Por exemplo:
 
 Cada número nas tuplas representa uma coordenada relativa à posição inicial da peça. O sistema transforma essas coordenadas relativas em posições absolutas na tela usando o offset da peça.
 
+# Explicação do Sistema de Coordenadas dos Tetrônimos
+
+## 📊 Estrutura da Grade 4x4
+
+Cada tetrônimo é definido dentro de uma **grade virtual 4x4**, onde:
+
+- **Primeiro elemento da tupla (r)**: Número da **linha** (0 a 3)
+- **Segundo elemento da tupla (c)**: Número da **coluna** (0 a 3)
+
+## 🧩 Como Funciona na Prática
+
+Cada tupla `(r, c)` representa a posição de **um bloco individual** dentro da peça. A lista completa de tuplas define todos os blocos que formam a peça.
+
+### Exemplo: Peça T - `[(0,1), (1,0), (1,1), (2,1)]`
+
+**Visualização da grade 4x4:**
+```
+Coluna: 0   1   2   3
+Linha 0: □   ■   □   □
+Linha 1: ■   ■   □   □  
+Linha 2: □   ■   □   □
+Linha 3: □   □   □   □
+```
+
+**Quebra da peça T:**
+- `(0,1)` → Linha 0, Coluna 1 → ■
+- `(1,0)` → Linha 1, Coluna 0 → ■
+- `(1,1)` → Linha 1, Coluna 1 → ■
+- `(2,1)` → Linha 2, Coluna 1 → ■
+
+### Exemplo: Peça I - `[(0,1), (1,1), (2,1), (3,1)]`
+
+**Visualização:**
+```
+Coluna: 0   1   2   3
+Linha 0: □   ■   □   □
+Linha 1: □   ■   □   □
+Linha 2: □   ■   □   □  
+Linha 3: □   ■   □   □
+```
+
+## 🔄 Transformação para Coordenadas da Tela
+
+A função `get_tetromino_coords()` converte as coordenadas relativas (da grade 4x4) para coordenadas absolutas na tela:
+
+```python
+def get_tetromino_coords():
+    return [(r + tetromino_offset[0], c + tetromino_offset[1]) 
+            for (r, c) in tetromino]
+```
+
+**Exemplo:** Se `tetromino_offset = [5, 8]` e temos o bloco `(1, 2)`:
+- Coordenada final: `(5 + 1, 8 + 2) = (6, 10)`
+
+A grade 4x4 é apenas um sistema de coordenadas **relativo** para definir o formato de cada peça, que depois é posicionado na tela real através do offset.
+
 ## 🔧 Funções do Jogo
 
 ### `get_joystick()`
