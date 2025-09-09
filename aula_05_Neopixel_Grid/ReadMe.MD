@@ -208,7 +208,6 @@ screen = PixelFramebuffer(
     pixel_height,
     num_tiles,
     rotation = 0, #3
-    reverse_x=True,
 )
 
 # O quadrado inicia no centro da tela
