@@ -623,6 +623,7 @@ para esse formato.
 
 Na pasta imgs eu deixei salvas algumas imagens já convertidas. No código abaixo, conecte duas 
 matrizes 16x16 para criar uma tela 32x16 e exibir a imagem salva.
+![Conhece o Mario?](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_05_Neopixel_Grid/images/Mario.bmp)
 
 ```
 import time
@@ -737,6 +738,10 @@ usando BMPReader, ou você salva um grande bitmap, com os frames lado a lado, co
 e vai carregando cada pedaço da tira (sprite) e exibindo na tela, usando tileGrid.
 
 Não vou detalhar muito as duas abordagens, mas vou colocar os códigos de exemplo aqui.
+![Frame1](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_05_Neopixel_Grid/images/frame_1.bmp)
+![Frame2](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_05_Neopixel_Grid/images/frame_2.bmp)
+![Frame3](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_05_Neopixel_Grid/images/frame_3.bmp)
+![Frame4](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_05_Neopixel_Grid/images/frame_4.bmp)
 
 ```
 # Usando BMPReader
@@ -794,6 +799,7 @@ while True:
 
 ```
 E por fim, usando Adafruit_Imageload e as facilidades da biblioteca DisplayIO.
+![All Frames](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_05_Neopixel_Grid/images/all_frames.bmp)
 
 ```
 # Usando Display IO e ImageLoad
