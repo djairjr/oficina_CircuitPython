@@ -67,7 +67,7 @@ def get_joystick():
 
 Nossa função vai mover os objetos numa velocidade máxima de 2 pixels em cada direção. 
 
-## Transformando uma fita de led de 256 pixels, numa tela de 16x16 pixels.
+## Entendendo a matriz de Leds
 Vamos fazer um teste para descobrir como a biblioteca Neopixel vai endereçar os Leds da nossa Matriz.
 Primeiro, um pouco de matemática: nós temos um quadrado, com 16 leds de largura e 16 leds de altura.
 A área preenchida por Leds vai ser igual a 16x16 = 256. Esse é o número de pixels que temos.
@@ -104,7 +104,8 @@ while True:
         pixels.show()
         time.sleep(0.05)
 ```
-Como você deve ter observado, o programa acima acende cada um dos Leds da nossa matriz, na cor vermelha. E vai percorrendo
+## Transformando a matriz de Leds em Tela
+Como você deve ter observado, o programa anterior acende cada um dos Leds da nossa matriz, na cor vermelha. E vai percorrendo
 a próxima posição, até chegar na última. A distribuição dos leds é em zig-zag. 
 No entanto, quando vamos lidar com uma Tela, nós costumamos desenhar usando as referências de posição horizontal e vertical.
 A biblioteca adafruit_pixelbuf cria esse sistema de coordenadas e também um local que armazena o próximo quadro da nossa Tela
@@ -233,19 +234,19 @@ while True:
     else:
         # Do contrário, pega a posição x e y do joystick
         get_x, get_y = get_joystick ()
-        x_pos = old_x + int (get_x)
-        y_pos = old_y + int (get_y)
+        x_pos = old_x + int (get_x) # A coordenada x vai ser o valor anterior somado ao que obtemos do joystick
+        y_pos = old_y + int (get_y) # O mesmo para a coordenada y
 		
         # pinta o retangulo da tela
-        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255))
-        screen.display()
+        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255)) # desenho o retângulo colorido
+        screen.display() # Mostro o retângulo
         
         # Apaga o retângulo que estava desenhado na posição anterior
         if ((x_pos != old_x) or (y_pos != old_y)):
             screen.fill (0x000000)
 
         # Atualiza a posição
-        old_x = x_pos
+        old_x = x_pos # atualizo a posição antiga, com os valores da nova
         old_y = y_pos
         
         # Impede que o retângulo seja desenhado para além dos limites da tela
@@ -519,8 +520,382 @@ while True:
         time.sleep(0.1)
 ```
 
+## Usando algumas facilidades da DisplayIO
+O pessoal da Adafruit criou uma biblioteca fenomenal para lidar com qualquer tipo de display, a DisplayIO.
+Com ela, podemos iniciar qualquer display, em qualquer barramento e depois usar os mesmos métodos para 
+escrever na tela.
+Infelizmente, usar Neopixels como display não é totalmente viável, por limitações de hardware mesmo.
+Então a biblioteca pixel_framebuf faz o possível num hardware tão limitado.
+Apesar de não termos todas as comodidades de usar DisplayIO para as Neopixels, podemos usar algumas
+das suas facilidades, como desenhar bitmaps, fontes, e etc...
+
+O exemplo abaixo escreve um texto na tela e o desloca para a esquerda, enquanto muda as cores dele. Veja 
+com que facilidade se pode fazer isso...
+
+```
+import time
+import board
+import neopixel_spi as neopixel
+from rainbowio import colorwheel
+from adafruit_pixel_framebuf import PixelFramebuffer
+
+#Essas bibliotecas trabalham em interface com a DisplayIO
+from displayio import Bitmap
+from adafruit_display_text.bitmap_label import Label
+from adafruit_bitmap_font import bitmap_font
+import terminalio
+
+pixel_pin = board.A0
+pixel_width = 16
+pixel_height = 16
+num_tiles = 1
+num_pixels = pixel_width * pixel_height * num_tiles
+
+# Y offset, from the top of the display
+offset = 4
+# whether to mirror horizontally (test both values)
+upside_down = True
+
+pixels = neopixel.NeoPixel(
+    pixel_pin,
+    pixel_width * pixel_height * num_tiles, 
+    brightness=0.2,
+    auto_write=False,
+)
+
+screen = PixelFramebuffer(
+    pixels,
+    pixel_width,
+    pixel_height,
+    num_tiles,
+    rotation = 0
+)
+
+# Como estamos usando DisplayIO, podemos usar fontes Bitmap
+font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
+# Crio um Label, com texto customizado, usando a fonte e uma escala para ela
+label = Label(text="Sesc Av. Paulista     ", font=font, scale=2)
+# Leio o bitmap que está em Label, no caso, o texto na fonte especificada montado como Bitmap
+bitmap = label.bitmap
+
+colors = [0, 0]
+hue = 0
+while True:
+    # Para cada pixel na largura do bitmap
+    for x in range(bitmap.width):
+        # Uso uma cor do arco-iris para cada coluna do bitmap
+        hue = hue + 7
+        if hue >= 256:
+            hue = hue - 256
+        colors[1] = colorwheel(hue)
+
+        # Desloco o texto antigo para a esquerda
+        for a in range(screen.width - 1):
+            # Para cada linha
+            for y in range(screen.height):
+                screen.pixel(a, y, screen.pixel(a + 1, y))  # Desloco os pixels na horizontal
+
+        # Desenho a próxima linha
+        for y in range(screen.height):
+            # Pego o pixel dentro do bitmap
+            bm_y = y - offset
+            # Vejo se é preto ou colorido
+            if 0 <= bm_y < bitmap.height:
+                color_index = bitmap[x, bm_y] # colorido
+            else:
+                color_index = 0 # preto
+            screen.pixel(screen.width - 1, y, colors[color_index])  # Gravo o valor
+
+        # Mostro o display
+        screen.display()
+        #time.sleep(0.04)
+
+```
+## Dá pra exibir Imagens?
+Dá sim! Mas nós temos que ter alguns cuidados.
+Como estamos lidando com um microcontrolador com recursos muito limitados, o ideal é que
+nós usemos um tipo de imagem sem nenhuma compressão. Isso porque as operações de descompressão
+consomem muitos recursos. Então, não vale usar JPEG, PNG ou GIF, se você quiser trabalhar rápido.
+
+Nesse caso, temos que trabalhar com imagens BMP, com 24 bits (8 bits para cada cor RGB). Você
+pode gerar esse tipo de imagem usando GIMP e é claro que você pode converter uma imagem JPG
+para esse formato.
+
+Na pasta imgs eu deixei salvas algumas imagens já convertidas. No código abaixo, conecte duas 
+matrizes 16x16 para criar uma tela 32x16 e exibir a imagem salva.
+
+```
+import time
+import board
+import neopixel
+from adafruit_pixel_framebuf import PixelFramebuffer
+
+# A biblioteca bmp_reader é customizada
+# ela lê um arquivo bitmap e faz as conversões necessárias.
+from bmp_reader import BMPReader
+
+# Lê o Bitmap como arquivo
+friend_img = BMPReader ("images\Mario.bmp")
+
+# Pega os pixels do Bitmap e grava no objeto friend
+friend = friend_img.get_pixels()
+
+pixel_pin = board.A0
+pixel_width = 16
+pixel_height = 16
+num_tiles = 2
+num_pixels = pixel_width * pixel_height * num_tiles
+
+pixels = neopixel.NeoPixel(
+    pixel_pin,
+    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
+    brightness=0.2,
+    auto_write=False,
+)
+
+screen = PixelFramebuffer(
+    pixels,
+    pixel_width,
+    pixel_height,
+    num_tiles,
+    rotation = 0
+)
+
+# Percorre o objeto friend (colunas e linhas)
+for x in range (friend_img.width):
+    for y in range (friend_img.height):
+        # atribui a cor ao pixel na tela.
+        screen.pixel (y,x,friend[y][x])
 
 
+screen.display()
+```
+
+## BMP_Reader
+É uma biblioteca que implementa uma classe e métodos para lidar com as conversões de arquivos no formato BMP
+para que sejam lidos e interpretados pelo nosso sistema.
+
+```
+# The original is here: https://github.com/stuartm2/CircuitPython_BMP_Reader
+# This class reads in a simple BMP image returning a multi-dimensional
+# array of RGB values ideal for displaying with an array of Neopixels.
+
+class BMPReader(object):
+    def __init__(self, filename):
+        self._filename = filename
+        self._read_img_data()
+
+    def get_pixels(self):
+        pixel_grid = []
+        pixel_data = list(self._pixel_data)  # Trabalhamos com uma cópia
+
+        bytes_per_pixel = 3  # Assumindo 24-bit color depth (RGB)
+        row_size = self.width * bytes_per_pixel
+
+        for y in range(self.height):
+            row = []
+            for x in range(self.width):
+                # Cálculo do índice do pixel no vetor de dados
+                idx = (y * row_size) + (x * bytes_per_pixel)
+                b = pixel_data[idx]
+                g = pixel_data[idx + 1]
+                r = pixel_data[idx + 2]
+                row.append((r, g, b))
+            pixel_grid.append(row)
+
+        return pixel_grid
+
+    def _read_img_data(self):
+        def lebytes_to_int(bytes):
+            n = 0x00
+            for b in reversed(bytes):
+                n = (n << 8) | b
+            return n
+
+        with open(self._filename, 'rb') as f:
+            img_bytes = bytearray(f.read())
+
+        # Verificação do formato BMP
+        assert img_bytes[0:2] == b'BM', "Não é um arquivo BMP válido"
+        assert lebytes_to_int(img_bytes[30:34]) == 0, \
+            "A compressão não é suportada"
+        assert lebytes_to_int(img_bytes[28:30]) == 24, \
+            "A profundidade de cor de 24 bits é a única suportada"
+
+        # Extração das dimensões da imagem
+        start_pos = lebytes_to_int(img_bytes[10:14])
+        self.width = lebytes_to_int(img_bytes[18:22])
+        self.height = lebytes_to_int(img_bytes[22:26])
+
+        # Extração dos dados dos pixels
+        self._pixel_data = img_bytes[start_pos:]
+
+```
+## E animação? Dá também?
+Dá sim. De dois jeitos. Ou você pode salvar cada frame como um bmp separado e carregar um por um
+usando BMPReader, ou você salva um grande bitmap, com os frames lado a lado, como uma tira de filme
+e vai carregando cada pedaço da tira (sprite) e exibindo na tela, usando tileGrid.
+
+Não vou detalhar muito as duas abordagens, mas vou colocar os códigos de exemplo aqui.
+
+```
+# Usando BMPReader
+import time
+import board
+import neopixel_spi as neopixel
+from bmp_reader import BMPReader
+from adafruit_pixel_framebuf import PixelFramebuffer
+
+pixel_pin = board.A0
+pixel_width = 16
+pixel_height = 16
+num_tiles = 2
+num_pixels = pixel_width * pixel_height * num_tiles
+
+pixels = neopixel.NeoPixel(
+    spi,
+    pixel_width * pixel_height * num_tiles, 
+    brightness=0.2,
+    auto_write=False,
+)
+
+screen = PixelFramebuffer(
+    pixels,
+    pixel_width,
+    pixel_height,
+    num_tiles,
+    rotation = 0
+)
+
+# Cada um dos frames é um arquivo 16x32 separado
+frame_file = ['frame_1.bmp', 'frame_2.bmp', 'frame_3.bmp', 'frame_4.bmp']
+
+# Criei uma rotina para ler cada um dos frames e me retornar
+# largura, altura e a matriz de cores
+def getframe (framefile):
+    frame_img = BMPReader ("images/" + framefile)
+    frame = frame_img.get_pixels()
+    return frame_img.width, frame_img.height, frame
+
+while True:
+    screen.fill(0) # limpo a tela
+    # Para cada arquivo da lista de frames
+    for file in frame_file:
+        # Recupero os valores usando minha função getframe
+        frame_width, frame_height, myframe = getframe(file)
+        for x in range (frame_width):
+            for y in range (frame_height):
+                #Atribuo o valor de cor na coordenada correta
+                screen.pixel (y,x,myframe[y][x])
+
+        screen.display() # Mostro a imagem     
+        # time.sleep (0.05)
 
 
+```
+E por fim, usando Adafruit_Imageload e as facilidades da biblioteca DisplayIO.
 
+```
+# Usando Display IO e ImageLoad
+
+import time
+import board
+import neopixel
+from adafruit_pixel_framebuf import PixelFramebuffer
+
+# Nessa abordagem vou usar os objetos Bitmap e Pallete da biblioteca
+# Display IO e carregar a imagem, usando Imageload
+import displayio
+import adafruit_imageload
+
+pixel_pin = board.A0
+pixel_width = 16
+pixel_height = 16
+num_tiles = 2
+num_pixels = pixel_width * pixel_height * num_tiles
+
+pixels = neopixel.NeoPixel(
+    pixel_pin,
+    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
+    brightness=0.2,
+    auto_write=False,
+)
+
+screen = PixelFramebuffer(
+    pixels,
+    pixel_width,
+    pixel_height,
+    num_tiles,
+    rotation = 0
+)
+
+# A imagem está organizada como uma Folha de Sprites, com 16 quadros com 16x32 pixels
+# organizados lado a lado.
+sprite_sheet, palette = adafruit_imageload.load(
+    "images/all_frames.bmp",
+    bitmap=displayio.Bitmap, # Coloco essa imagem, num objeto displayio Bitmap
+    palette=displayio.Palette, # E a Paleta da imagem num objeto palette
+)
+
+# make the color at 0 index transparent.
+#palette.make_transparent(0)
+
+# Agora eu indico o tamanho do meu Sprite. Nesse caso, eu criei uma imagem em uma linha
+# horizontal, com 16 sprites lado a lado.
+sprite = displayio.TileGrid(
+    sprite_sheet, # Meu objeto adafruit_imageload
+    pixel_shader=palette, # a paleta desse objeto
+    width=16, # tenho 16 sprites lado a lado
+    height=1, # em uma unica linha
+    tile_width=16, # cada sprite mede 16 pixels de largura
+    tile_height=16, # por 16 pixels de altura
+    default_tile=0, # e o tile que vai ser exibido por padrão é o primeiro
+)
+
+frame_index = 0  # índice do frame atual
+frame_delay = 0.02 # Seria o FPS, mas não funciona
+last_frame_time = time.monotonic()
+
+while True:
+    # Limpar a tela
+    screen.fill(0)
+
+    # Calcular o índice do tile atual dentro do bitmap
+    tile_x = frame_index % sprite.width
+    tile_y = frame_index // sprite.width
+
+    # Essa rotina exibe o tile atual na neopixel
+    # e faz uma conversão da cor de 16 bits por cor
+    # para uma cor de 8 bits por cor.
+    
+    for x in range(sprite.tile_width):
+        for y in range(sprite.tile_height):
+            pixel_color = sprite_sheet[tile_x * sprite.tile_width + x, tile_y * sprite.tile_height + y]
+            
+            # Extrair os componentes RGB (vermelho, verde, azul) de 16 bits
+            r = (pixel_color >> 11) & 0x1F  # Componente vermelho
+            g = (pixel_color >> 5) & 0x3F    # Componente verde
+            b = pixel_color & 0x1F           # Componente azul
+            
+            # Converter os componentes de 16 bits em 8 bits (0-255)
+            r = (r * 255) // 31
+            g = (g * 255) // 63
+            b = (b * 255) // 31
+            
+            # Exibir o pixel na tela Neopixel (formato RGB de 24 bits)
+            neopixel_color = (r, g, b)
+            screen.pixel(x, y, neopixel_color)
+
+
+    # Verifica se é hora de exibir o próximo frame
+    current_time = time.monotonic()
+    if current_time - last_frame_time >= frame_delay:
+        # Atualizar o índice do frame para o próximo
+        frame_index = (frame_index + 1) % (sprite.width * sprite.height)
+
+        # Atualizar o tempo do último frame exibido
+        last_frame_time = current_time
+    
+    # Atualizar a exibição
+    screen.display()
+```

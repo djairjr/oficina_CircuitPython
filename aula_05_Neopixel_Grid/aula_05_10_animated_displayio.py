@@ -1,16 +1,19 @@
-""" Using Displayio Helpers """
+# Usando Display IO e ImageLoad
 
 import time
 import board
 import neopixel
+from adafruit_pixel_framebuf import PixelFramebuffer
+
+# Nessa abordagem vou usar os objetos Bitmap e Pallete da biblioteca
+# Display IO e carregar a imagem, usando Imageload
 import displayio
 import adafruit_imageload
-from adafruit_pixel_framebuf import PixelFramebuffer
 
 pixel_pin = board.A0
 pixel_width = 16
 pixel_height = 16
-num_tiles = 1
+num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
 
 pixels = neopixel.NeoPixel(
@@ -28,30 +31,31 @@ screen = PixelFramebuffer(
     rotation = 0
 )
 
-# Load the sprite sheet (bitmap)
+# A imagem está organizada como uma Folha de Sprites, com 16 quadros com 16x32 pixels
+# organizados lado a lado.
 sprite_sheet, palette = adafruit_imageload.load(
-    # Image with 64 pixels width and 32 pixels height. Contains 16 frames 16x32
     "images/all_frames.bmp",
-    bitmap=displayio.Bitmap,
-    palette=displayio.Palette,
+    bitmap=displayio.Bitmap, # Coloco essa imagem, num objeto displayio Bitmap
+    palette=displayio.Palette, # E a Paleta da imagem num objeto palette
 )
 
 # make the color at 0 index transparent.
 #palette.make_transparent(0)
 
-# Create the sprite TileGrid
+# Agora eu indico o tamanho do meu Sprite. Nesse caso, eu criei uma imagem em uma linha
+# horizontal, com 16 sprites lado a lado.
 sprite = displayio.TileGrid(
-    sprite_sheet,
-    pixel_shader=palette,
-    width=16,
-    height=1,
-    tile_width=16,
-    tile_height=16,
-    default_tile=0,
+    sprite_sheet, # Meu objeto adafruit_imageload
+    pixel_shader=palette, # a paleta desse objeto
+    width=16, # tenho 16 sprites lado a lado
+    height=1, # em uma unica linha
+    tile_width=16, # cada sprite mede 16 pixels de largura
+    tile_height=16, # por 16 pixels de altura
+    default_tile=0, # e o tile que vai ser exibido por padrão é o primeiro
 )
 
 frame_index = 0  # índice do frame atual
-frame_delay = 0.02  # This setting does not work...
+frame_delay = 0.02 # Seria o FPS, mas não funciona
 last_frame_time = time.monotonic()
 
 while True:
@@ -62,18 +66,24 @@ while True:
     tile_x = frame_index % sprite.width
     tile_y = frame_index // sprite.width
 
-    # Exibir o tile atual na tela Neopixel
+    # Essa rotina exibe o tile atual na neopixel
+    # e faz uma conversão da cor de 16 bits por cor
+    # para uma cor de 8 bits por cor.
+    
     for x in range(sprite.tile_width):
         for y in range(sprite.tile_height):
             pixel_color = sprite_sheet[tile_x * sprite.tile_width + x, tile_y * sprite.tile_height + y]
+            
             # Extrair os componentes RGB (vermelho, verde, azul) de 16 bits
             r = (pixel_color >> 11) & 0x1F  # Componente vermelho
             g = (pixel_color >> 5) & 0x3F    # Componente verde
             b = pixel_color & 0x1F           # Componente azul
+            
             # Converter os componentes de 16 bits em 8 bits (0-255)
             r = (r * 255) // 31
             g = (g * 255) // 63
             b = (b * 255) // 31
+            
             # Exibir o pixel na tela Neopixel (formato RGB de 24 bits)
             neopixel_color = (r, g, b)
             screen.pixel(x, y, neopixel_color)

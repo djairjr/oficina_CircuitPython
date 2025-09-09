@@ -1,16 +1,22 @@
 import time
 import board
-import neopixel_spi as neopixel
-from bmp_reader import BMPReader
+import neopixel
 from adafruit_pixel_framebuf import PixelFramebuffer
 
-friend_img = BMPReader ("images\Mario.bmp") # My BMP File
+# A biblioteca bmp_reader é customizada
+# ela lê um arquivo bitmap e faz as conversões necessárias.
+from bmp_reader import BMPReader
+
+# Lê o Bitmap como arquivo
+friend_img = BMPReader ("images\Mario.bmp")
+
+# Pega os pixels do Bitmap e grava no objeto friend
 friend = friend_img.get_pixels()
 
 pixel_pin = board.A0
 pixel_width = 16
 pixel_height = 16
-num_tiles = 1
+num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
 
 pixels = neopixel.NeoPixel(
@@ -28,8 +34,10 @@ screen = PixelFramebuffer(
     rotation = 0
 )
 
+# Percorre o objeto friend (colunas e linhas)
 for x in range (friend_img.width):
     for y in range (friend_img.height):
+        # atribui a cor ao pixel na tela.
         screen.pixel (y,x,friend[y][x])
 
 

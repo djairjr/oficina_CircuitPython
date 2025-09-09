@@ -6,20 +6,20 @@ from simpleio import map_range
 import neopixel
 from adafruit_pixel_framebuf import PixelFramebuffer
 
+# Essa biblioteca faz umas animações com as cores muito bacanas!
 from rainbowio import colorwheel
 
 # Em alguns casos nós vamos usar a LED Driver Board da Xiao
 pixel_pin = board.D0
-
-# pixel_pin = board.D7 
 pixel_width = 16
 pixel_height = 16
 num_tiles = 1
 
+# Adicionando os eixos X e Y do Joystick - Lembra que são potenciômetros?
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
 
-# Convém encontrar esses valores usando o programa da Aula 4
+# Eu encontrei esses valores num teste.
 minVal = 200
 maxVal = 65535
 
@@ -34,9 +34,12 @@ def get_joystick():
     y_coord = int (map_range (joystick_y.value, minVal, maxVal, - 2 , 2))
     return x_coord, y_coord
 
+# Primeiro eu adiciono o objeto neopixel com num_pixels igual à largura da tela, vezes a altura vezes o número de telas
+num_pixels = pixel_width * pixel_height * num_tiles
+
 pixels = neopixel.NeoPixel(
     pixel_pin,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
+    num_pixels, 
     brightness=0.1,
     auto_write=False,
 )
@@ -62,18 +65,19 @@ while True:
     else:
         # Do contrário, pega a posição x e y do joystick
         get_x, get_y = get_joystick ()
-        x_pos = old_x + int (get_x)
-        y_pos = old_y + int (get_y)
+        x_pos = old_x + int (get_x) # A coordenada x vai ser o valor anterior somado ao que obtemos do joystick
+        y_pos = old_y + int (get_y) # O mesmo para a coordenada y
+		
         # pinta o retangulo da tela
-        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255))
-        screen.display()
+        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255)) # desenho o retângulo colorido
+        screen.display() # Mostro o retângulo
         
         # Apaga o retângulo que estava desenhado na posição anterior
         if ((x_pos != old_x) or (y_pos != old_y)):
             screen.fill (0x000000)
 
         # Atualiza a posição
-        old_x = x_pos
+        old_x = x_pos # atualizo a posição antiga, com os valores da nova
         old_y = y_pos
         
         # Impede que o retângulo seja desenhado para além dos limites da tela
@@ -85,4 +89,3 @@ while True:
             old_y = 3
         if (old_y > pixel_height * num_tiles - 3):
             old_y = pixel_height * num_tiles - 3
-        
