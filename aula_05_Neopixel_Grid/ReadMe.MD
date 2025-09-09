@@ -125,31 +125,41 @@ num_pixels = pixel_width * pixel_height * num_tiles
 pixels = neopixel.NeoPixel(
     pixel_pin,
     num_pixels, 
-    brightness=0.1,
+    brightness=0.1, # Deixe o brilho baixo para que a fonte aguente
     auto_write=False,
 )
 
-# Cria um Grid a partir da Neopixel e um Framebuffer também
-screen = PixelFramebuffer(
-    pixels,
-    pixel_width,
-    pixel_height,
-    num_tiles,
-    rotation = 0, #3
-    reverse_x=True,
-)
+# Cada painel de Leds tem uma inicialização diferente. 
+# É importante que você teste alguns parâmetros para ver se tudo está ok.
 
-# Limpa a tela 
-screen.fill(0)
+screen = PixelFramebuffer(
+    pixels, # Qual objeto Neopixel vai ser a nossa tela?
+    pixel_width, # A largura, em pixels
+    pixel_height, # Qual a altura, em pixels...
+    num_tiles, # Quantas matrizes você vai usar?
+    rotation = 0, #Vai de 0 a 3, aumentando em 90 graus para cada
+    reverse_x=True,# Use isso se o texto parecer espelhado no eixo horizontal
+
+# Preenche a tela com a cor especificada.
+# Para essa biblioteca, a cor não é passada como uma tupla RGB e sim como uma sequência
+# de números hexadecimais (base 16). Cada cor vai variar de 0x00 a 0xFF (0x indica que o número é Hexa).
+# Nesse caso, o formato é 0xRRGGBB
+# Se quisermos preencher com vermelho, a cor Hexa seria 0xFF0000 
+screen.fill(0) # ou screen.fill(0x000000)
+
 # E ai temos vários métodos que servem para desenhar nessa tela
 print (dir (screen))
-# Copiar o Arquivo font5x8.bin para a raiz
-# Ou tem esse erro: OSError: [Errno 2] Este arquivo/diretório não existe: font5x8.bin
-screen.text ("HI", 1, 1, 0xFF0000)
-#screen.rect (2,2, 5,5, 0xFF0000) # A cor é passada em Hexadecimal 0xRRGGBB
+
+screen.text ("HI", 1, 1, 0xFF0000) # escreve Hi, na posição 1,1
+screen.rect (2,2, 5,5, 0xFF0000) # Na posição 2,2 desenha o contorno de um retangulo 5,5, na cor vermelha
+screen.fill_rect(2, 2, 8, 12, 0xFF0000) # aqui, desenhamos um retângulo preenchido pela cor
+screen.pixel (7,7,0x00FF00) # acende o led na posição 7,7
+screen.line (0,0, 5,7, 0x0000FF) # traça uma linha da posição 0,0 até a posição 5,7 na cor azul
+screen.hline(2, 3, 5, 0xFF0000) # traça uma linha horizontal de 5 pixels a partir da posição 2,3
+screen.vline(2, 3, 5, 0xFF0000)# traça uma linha vertical de 5 pixels a partir da posição 2,3
 screen.display()
 ```
-
+## Juntando Lé com Cré
 Agora, vamos usar o que aprendemos. Vamos adicionar nossa rotina get_joystick e ir movimentando
 um retângulo na tela.
 
@@ -173,9 +183,11 @@ pixel_width = 16
 pixel_height = 16
 num_tiles = 1
 
+# Adicionando os eixos X e Y do Joystick - Lembra que são potenciômetros?
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
 
+# Eu encontrei esses valores num teste.
 minVal = 200
 maxVal = 65535
 
@@ -190,9 +202,12 @@ def get_joystick():
     y_coord = int (map_range (joystick_y.value, minVal, maxVal, - 2 , 2))
     return x_coord, y_coord
 
+# Primeiro eu adiciono o objeto neopixel com num_pixels igual à largura da tela, vezes a altura vezes o número de telas
+num_pixels = pixel_width * pixel_height * num_tiles
+
 pixels = neopixel.NeoPixel(
     pixel_pin,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
+    num_pixels, 
     brightness=0.1,
     auto_write=False,
 )
@@ -220,6 +235,7 @@ while True:
         get_x, get_y = get_joystick ()
         x_pos = old_x + int (get_x)
         y_pos = old_y + int (get_y)
+		
         # pinta o retangulo da tela
         screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255))
         screen.display()
@@ -243,7 +259,7 @@ while True:
             old_y = pixel_height * num_tiles - 3
         
 ```
-
+## Desenhando na tela - Lousa Mágica
 E agora, podemos fazer a nossa lousa mágica. 
 Vamos usar a nossa função get_joystick para atualizar a posição do pixel de desenho
 na tela e ao pressionar o botão, apagamos o desenho.
@@ -332,7 +348,7 @@ while True:
         if (old_y > pixel_height * num_tiles - 1):
             old_y = pixel_height * num_tiles - 1
 ```
-
+## Snake Game
 Por fim, vamos fazer o jogo de Snake.
 
 O jogo Snake é um clássico e com ele, nós vamos aprender uma das maneiras de realizar a detecção de colisões, rotina muito importante em qualquer jogo.
