@@ -1,4 +1,4 @@
-# Recriando os Clássicos
+# Neopixel Grid - Usando Neopixel como Tela
 
 ## Diagrama de Montagem para o Console
 Vou padronizar a montagem do nosso sistema para que nós sigamos a pinagem da [Led Driver Board da Seeed Studio](https://wiki.seeedstudio.com/led_driver_board/).
@@ -38,7 +38,7 @@ while True:
 ```
 
 Movendo o Joystick para cima e para baixo, e para a esquerda e direita, devemos ter valores na faixa
-de 0 a 65535. Mas como há limitações mecânicas no curso dos dois eixos, pode ser que os valores máximo
+de **0 a 65535**. Mas como há limitações mecânicas no curso dos dois eixos, pode ser que os valores máximo
 e mínimo estejam um pouco fora disso. Nos meus testes anteriores, o valor mínimo estava na faixa de 200.
 
 A função get_joystick retorna os valores de incremento ou decremento das coordenadas x e y, em função dos valores obtidos pelos potenciômetros.
@@ -48,7 +48,7 @@ Por enquanto, nós não vamos usar essa função. Mas vamos incluí-la logo mais
 ```
 # Essa função retorna as coordenadas x e y do joystick
 def get_joystick():
-    # Returns -1 0 or 1 depending on joystick position
+    # Returns -2, -1, 0, 1 or 2 depending on joystick position
 	# o formato de map_range (valor lido, min_lido, max_lido, min_desejado, max_desejado)
     x_coord = int (map_range (joystick_x.value, 0, 65535, - 2 , 2))
     y_coord = int (map_range (joystick_y.value, 0, 65535, - 2 , 2))
@@ -161,7 +161,7 @@ from digitalio import DigitalInOut, Direction, Pull
 from simpleio import map_range
 
 import neopixel
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 # Essa biblioteca faz umas animações com as cores muito bacanas!
 from rainbowio import colorwheel
@@ -206,8 +206,8 @@ screen = PixelFramebuffer(
     pixels,
     pixel_width,
     pixel_height,
-    num_tiles,
-    rotation = 0, #3
+    orientation=VERTICAL,
+    rotation = 0, 
 )
 
 # O quadrado inicia no centro da tela
@@ -556,7 +556,7 @@ screen = PixelFramebuffer(
     pixel_height,
     orientation = VERTICAL,
     rotation = 0,
-	reverse_x = True
+	reverse_x = True # Se o texto sair espelhado
 )
 
 # Como estamos usando DisplayIO, podemos usar fontes Bitmap
