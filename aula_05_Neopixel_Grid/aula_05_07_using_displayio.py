@@ -1,8 +1,8 @@
 import time
 import board
-import neopixel_spi as neopixel
+import neopixel
 from rainbowio import colorwheel
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 #Essas bibliotecas trabalham em interface com a DisplayIO
 from displayio import Bitmap
@@ -13,7 +13,7 @@ import terminalio
 pixel_pin = board.A0
 pixel_width = 16
 pixel_height = 16
-num_tiles = 1
+num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
 
 # Y offset, from the top of the display
@@ -30,9 +30,9 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    num_tiles,
+    orientation = VERTICAL,
     rotation = 0
 )
 

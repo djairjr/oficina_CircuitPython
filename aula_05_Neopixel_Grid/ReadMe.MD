@@ -105,7 +105,7 @@ A biblioteca adafruit_pixelbuf cria esse sistema de coordenadas e também um loc
 import board
 import time
 import neopixel
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 pixel_pin = board.A0
 pixel_width = 16
@@ -127,8 +127,8 @@ screen = PixelFramebuffer(
     pixels, # Qual objeto Neopixel vai ser a nossa tela?
     pixel_width, # A largura, em pixels
     pixel_height, # Qual a altura, em pixels...
-    num_tiles, # Quantas matrizes você vai usar?
     rotation = 0, #Vai de 0 a 3, aumentando em 90 graus para cada
+	orientation = VERTICAL, # como elas estão dispostas
     reverse_x=True,# Use isso se o texto parecer espelhado no eixo horizontal
 
 # Preenche a tela com a cor especificada.
@@ -168,8 +168,6 @@ from rainbowio import colorwheel
 
 # Em alguns casos nós vamos usar a LED Driver Board da Xiao
 pixel_pin = board.D0
-
-# pixel_pin = board.D7 
 pixel_width = 16
 pixel_height = 16
 num_tiles = 1
@@ -214,8 +212,8 @@ screen = PixelFramebuffer(
 )
 
 # O quadrado inicia no centro da tela
-old_x = pixel_width //2
-old_y = pixel_height * num_tiles // 2
+old_x = screen.width //2
+old_y = screen.height * num_tiles // 2
 
 while True:
     # Quando apertar o botão do Joystick, apaga a tela
@@ -228,7 +226,7 @@ while True:
         y_pos = old_y + int (get_y) # O mesmo para a coordenada y
 		
         # pinta o retangulo da tela
-        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255)) # desenho o retângulo colorido
+        screen.fill_rect (x_pos, y_pos, 2, 2, colorwheel((time.monotonic()*50)%255)) # desenho o retângulo colorido
         screen.display() # Mostro o retângulo
         
         # Apaga o retângulo que estava desenhado na posição anterior
@@ -242,12 +240,13 @@ while True:
         # Impede que o retângulo seja desenhado para além dos limites da tela
         if (old_x < 3):
             old_x = 3
-        if (old_x > pixel_width - 3):
-            old_x = pixel_width - 3
+        if (old_x > screen.width - 3):
+            old_x = screen.width - 3
         if (old_y < 3):
             old_y = 3
-        if (old_y > pixel_height * num_tiles - 3):
-            old_y = pixel_height * num_tiles - 3
+        if (old_y > screen.height * num_tiles - 3):
+            old_y = screen.height * num_tiles - 3
+
         
 ```
 ## Desenhando na tela - Lousa Mágica
@@ -264,12 +263,12 @@ import neopixel
 from rainbowio import colorwheel
 
 import adafruit_rtttl
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 pixel_pin = board.A0
 pixel_width = 16
 pixel_height = 16
-num_tiles = 1
+num_tiles = 2
 
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
@@ -289,12 +288,12 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    num_tiles,
-    rotation = 0,
-	reverse_x=True,
+    orientation = VERTICAL,
+    rotation = 0
 )
+
 
 def moveSound():
     adafruit_rtttl.play (buzzer, "move:d=4,o=5,b=880:8c6")
@@ -304,14 +303,15 @@ def deleteSound():
 
 def get_joystick():
     # Returns -1 0 or 1 depending on joystick position
-    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
-    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
+    x_coord = int (map_range (joystick_x.value, 200, 65535, 2 , -2))
+    y_coord = int (map_range (joystick_y.value, 200, 65535, 2 , -2))
     return x_coord, y_coord
 
 # Center Screen
-old_x = pixel_width //2
-old_y = pixel_height * num_tiles // 2
+old_x = screen.width //2
+old_y = screen.height // 2
 x_pos, y_pos = old_x, old_y
+
 
 while True:
     if (not trigger.value):
@@ -323,7 +323,7 @@ while True:
         y_pos = old_y + y
         if x_pos != old_x or y_pos != old_y:
             moveSound()
-        screen.line (old_y, old_x, y_pos, x_pos, colorwheel((time.monotonic()*50)%255))
+        screen.line (old_x, old_y, x_pos, y_pos, colorwheel((time.monotonic()*50)%255))
         screen.display()
         time.sleep(0.1)
         old_x = x_pos
@@ -332,12 +332,12 @@ while True:
         """ Tratando os limites da tela """
         if (old_x < 0):
             old_x = 0
-        if (old_x > pixel_width - 1):
-            old_x = pixel_width - 1
+        if (old_x > screen.width - 1):
+            old_x = screen.width - 1
         if (old_y < 0):
             old_y = 0
-        if (old_y > pixel_height * num_tiles - 1):
-            old_y = pixel_height * num_tiles - 1
+        if (old_y > screen.height - 1):
+            old_y = screen.height - 1    
 ```
 ## Snake Game
 Por fim, vamos fazer o jogo de Snake.
@@ -364,7 +364,7 @@ from simpleio import map_range
 import neopixel
 from rainbowio import colorwheel
 
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
@@ -376,7 +376,7 @@ trigger.pull = Pull.UP
 pixel_pin = board.A0
 pixel_width = 16  
 pixel_height = 16
-num_tiles = 1
+num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
 
 pixels = neopixel.NeoPixel(
@@ -388,10 +388,10 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    rotation = 0,
-    reverse_x=True
+    orientation = VERTICAL,
+    rotation = 0
 )
 
 # A função get_direction é uma variação da get_joystick, mais útil para o jogo Snake.
@@ -399,7 +399,7 @@ screen = PixelFramebuffer(
 # Sem essa implementação, a serpente colide muitas vezes com o próprio corpo.
 
 def get_direction():
-    x = int(map_range(joystick_x.value, 0, 65535, -1.5, 1.5))
+    x = int(map_range(joystick_x.value, 0, 65535, 1.5, -1.5))
     y = int(map_range(joystick_y.value, 0, 65535,  -1.5, 1.5))
     if abs(x) > abs(y):
         return (0, x)  # Horizontal Move
@@ -425,7 +425,7 @@ def get_pixel_color(x, y):
 
 def check_wall(x, y, wall_color):
     # checa primeiro os limites da tela
-    if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
+    if x < 0 or x >= screen.width  or y < 0 or y >= screen.height :
         return False
     # depois, checa as cores
     color = get_pixel_color(x, y)
@@ -439,9 +439,9 @@ def check_color(x, y, colorcheck):
 # Monta o corpo da serpente no centro da tela como uma lista, com três elementos inicialmente.
 # O primeiro elemento é a cabeça. E os outros dois, o corpo.
 snake_body = [
-    [pixel_height // 2, pixel_width // 2],
-    [pixel_height // 2, pixel_width // 2 - 1],
-    [pixel_height // 2, pixel_width // 2 - 2]
+    [screen.height // 2, screen.width // 2],
+    [screen.height // 2, screen.width // 2 - 1],
+    [screen.height // 2, screen.width // 2 - 2]
 ]
 
 # Coloca a comida numa posição aleatória da Tela
@@ -473,21 +473,18 @@ while True:
 
     # Checa se o jogo acabou. A serpente chegou nos limites da tela? Ou a cabeça está em colisão com o corpo?
     if (
-        new_head[0] < 0 or new_head[0] >= pixel_height  or
-        new_head[1] < 0 or new_head[1] >= pixel_width or
+        new_head[0] < 0 or new_head[0] >= screen.height  or
+        new_head[1] < 0 or new_head[1] >= screen.width or
         new_head in snake_body
     ):
 		# Se isso acontece, volta para a condição inicial.
-		# Que é a serpente com 3 pixels de comprimento no meio da tela
         snake_body = [
-            [pixel_height // 2, pixel_width // 2],
-            [pixel_height // 2, pixel_width // 2 - 1],
-            [pixel_height // 2, pixel_width // 2 - 2]
+            [screen.height // 2, screen.width // 2],
+            [screen.height // 2, screen.width // 2 - 1],
+            [screen.height // 2, screen.width // 2 - 2]
         ]
     else:
-	    # Senão, desenha a nova cabeça na primeira posição do corpo
-		# lembrando que snake_body[0] é a cabeça atual
-        snake_body.insert(0, new_head) # insere na posição 0 do corpo a nova cabeça
+        snake_body.insert(0, new_head)
 
         # Se a serpente comeu a comida, gera nova comida
         if snake_body[0] == food: #snake_body[0] é a cabeça
@@ -495,19 +492,20 @@ while True:
         else:
             snake_body.pop()
 
-        # Sempre limpa a tela antes de desenhar o novo quadro
+        # Clear screen and draw
         screen.fill(0)
         
-        # Desenha a cabeça da serpente e o corpo
+        # Draw snake head and body
         for segment in snake_body:
             screen.pixel(segment[1], segment[0], 0x00FF00)  # Snake
         
-        # Desenha a comida
+        # Draw Food
         screen.pixel(food[1], food[0], 0xFF0000)
         
         # Show everything
         screen.display()
         time.sleep(0.1)
+
 ```
 
 ## Usando algumas facilidades da DisplayIO
@@ -527,7 +525,7 @@ import time
 import board
 import neopixel_spi as neopixel
 from rainbowio import colorwheel
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 #Essas bibliotecas trabalham em interface com a DisplayIO
 from displayio import Bitmap
@@ -555,10 +553,11 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    num_tiles,
-    rotation = 0
+    orientation = VERTICAL,
+    rotation = 0,
+	reverse_x = True
 )
 
 # Como estamos usando DisplayIO, podemos usar fontes Bitmap
@@ -620,7 +619,7 @@ matrizes 16x16 para criar uma tela 32x16 e exibir a imagem salva.
 import time
 import board
 import neopixel
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 # A biblioteca bmp_reader é customizada
 # ela lê um arquivo bitmap e faz as conversões necessárias.
@@ -647,10 +646,11 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    num_tiles,
-    rotation = 0
+    orientation = VERTICAL,
+    rotation = 0,
+	reverse_x = True
 )
 
 # Percorre o objeto friend (colunas e linhas)
@@ -739,9 +739,9 @@ Não vou detalhar muito as duas abordagens, mas vou colocar os códigos de exemp
 # Usando BMPReader
 import time
 import board
-import neopixel_spi as neopixel
+import neopixel
 from bmp_reader import BMPReader
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 pixel_pin = board.A0
 pixel_width = 16
@@ -750,7 +750,7 @@ num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
 
 pixels = neopixel.NeoPixel(
-    spi,
+    pixel_pin,
     pixel_width * pixel_height * num_tiles, 
     brightness=0.2,
     auto_write=False,
@@ -758,10 +758,11 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    num_tiles,
-    rotation = 0
+    orientation = VERTICAL,
+    rotation = 0,
+	reverse_x = True
 )
 
 # Cada um dos frames é um arquivo 16x32 separado
@@ -800,7 +801,7 @@ E por fim, usando Adafruit_Imageload e as facilidades da biblioteca DisplayIO.
 import time
 import board
 import neopixel
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 # Nessa abordagem vou usar os objetos Bitmap e Pallete da biblioteca
 # Display IO e carregar a imagem, usando Imageload
@@ -822,10 +823,11 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    num_tiles,
-    rotation = 0
+    orientation = VERTICAL,
+    rotation = 0,
+	reverse_x = True
 )
 
 # A imagem está organizada como uma Folha de Sprites, com 16 quadros com 16x32 pixels

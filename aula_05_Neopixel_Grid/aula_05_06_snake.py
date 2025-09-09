@@ -8,7 +8,7 @@ from simpleio import map_range
 import neopixel
 from rainbowio import colorwheel
 
-from adafruit_pixel_framebuf import PixelFramebuffer
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
@@ -20,7 +20,7 @@ trigger.pull = Pull.UP
 pixel_pin = board.A0
 pixel_width = 16  
 pixel_height = 16
-num_tiles = 1
+num_tiles = 2
 num_pixels = pixel_width * pixel_height * num_tiles
 
 pixels = neopixel.NeoPixel(
@@ -32,18 +32,19 @@ pixels = neopixel.NeoPixel(
 
 screen = PixelFramebuffer(
     pixels,
-    pixel_width,
+    pixel_width * num_tiles,
     pixel_height,
-    rotation = 0,
-    reverse_x=True
+    orientation = VERTICAL,
+    rotation = 0
 )
+print (screen.width, screen.height)
 
 # A função get_direction é uma variação da get_joystick, mais útil para o jogo Snake.
 # Ela compara os valores absolutos de x e y para determinar a direção do movimento.
 # Sem essa implementação, a serpente colide muitas vezes com o próprio corpo.
 
 def get_direction():
-    x = int(map_range(joystick_x.value, 0, 65535, -1.5, 1.5))
+    x = int(map_range(joystick_x.value, 0, 65535, 1.5, -1.5))
     y = int(map_range(joystick_y.value, 0, 65535,  -1.5, 1.5))
     if abs(x) > abs(y):
         return (0, x)  # Horizontal Move
@@ -69,7 +70,7 @@ def get_pixel_color(x, y):
 
 def check_wall(x, y, wall_color):
     # checa primeiro os limites da tela
-    if x < 0 or x >= screen._width or y < 0 or y >= screen._height * screen._tile_num:
+    if x < 0 or x >= screen.width  or y < 0 or y >= screen.height :
         return False
     # depois, checa as cores
     color = get_pixel_color(x, y)
@@ -83,9 +84,9 @@ def check_color(x, y, colorcheck):
 # Monta o corpo da serpente no centro da tela como uma lista, com três elementos inicialmente.
 # O primeiro elemento é a cabeça. E os outros dois, o corpo.
 snake_body = [
-    [pixel_height // 2, pixel_width // 2],
-    [pixel_height // 2, pixel_width // 2 - 1],
-    [pixel_height // 2, pixel_width // 2 - 2]
+    [screen.height // 2, screen.width // 2],
+    [screen.height // 2, screen.width // 2 - 1],
+    [screen.height // 2, screen.width // 2 - 2]
 ]
 
 # Coloca a comida numa posição aleatória da Tela
@@ -117,15 +118,15 @@ while True:
 
     # Checa se o jogo acabou. A serpente chegou nos limites da tela? Ou a cabeça está em colisão com o corpo?
     if (
-        new_head[0] < 0 or new_head[0] >= pixel_height  or
-        new_head[1] < 0 or new_head[1] >= pixel_width or
+        new_head[0] < 0 or new_head[0] >= screen.height  or
+        new_head[1] < 0 or new_head[1] >= screen.width or
         new_head in snake_body
     ):
 		# Se isso acontece, volta para a condição inicial.
         snake_body = [
-            [pixel_height // 2, pixel_width // 2],
-            [pixel_height // 2, pixel_width // 2 - 1],
-            [pixel_height // 2, pixel_width // 2 - 2]
+            [screen.height // 2, screen.width // 2],
+            [screen.height // 2, screen.width // 2 - 1],
+            [screen.height // 2, screen.width // 2 - 2]
         ]
     else:
         snake_body.insert(0, new_head)

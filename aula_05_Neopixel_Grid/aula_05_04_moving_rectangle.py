@@ -55,8 +55,8 @@ screen = PixelFramebuffer(
 )
 
 # O quadrado inicia no centro da tela
-old_x = pixel_width //2
-old_y = pixel_height * num_tiles // 2
+old_x = screen.width //2
+old_y = screen.height * num_tiles // 2
 
 while True:
     # Quando apertar o botão do Joystick, apaga a tela
@@ -69,7 +69,7 @@ while True:
         y_pos = old_y + int (get_y) # O mesmo para a coordenada y
 		
         # pinta o retangulo da tela
-        screen.fill_rect (y_pos, x_pos, 2, 2, colorwheel((time.monotonic()*50)%255)) # desenho o retângulo colorido
+        screen.fill_rect (x_pos, y_pos, 2, 2, colorwheel((time.monotonic()*50)%255)) # desenho o retângulo colorido
         screen.display() # Mostro o retângulo
         
         # Apaga o retângulo que estava desenhado na posição anterior
@@ -83,9 +83,9 @@ while True:
         # Impede que o retângulo seja desenhado para além dos limites da tela
         if (old_x < 3):
             old_x = 3
-        if (old_x > pixel_width - 3):
-            old_x = pixel_width - 3
+        if (old_x > screen.width - 3):
+            old_x = screen.width - 3
         if (old_y < 3):
             old_y = 3
-        if (old_y > pixel_height * num_tiles - 3):
-            old_y = pixel_height * num_tiles - 3
+        if (old_y > screen.height * num_tiles - 3):
+            old_y = screen.height * num_tiles - 3
