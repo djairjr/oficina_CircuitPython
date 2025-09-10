@@ -1,3 +1,10 @@
+
+# Script Python para fazer o ajuste automático de Gamma de qualquer imagem.
+# Para executar: python gamma.py nomedaimagem.jpg -o nomedamimagem.bmp
+
+# Esse Script roda em Python mesmo, e não Circuitpython.
+
+
 import argparse
 from PIL import Image
 import os
