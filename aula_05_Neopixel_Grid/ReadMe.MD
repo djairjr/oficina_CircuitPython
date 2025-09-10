@@ -355,7 +355,7 @@ Em Snake, nós vamos lidar com os dois modos. Primeiro detectar as coordenadas d
 
 ```
 import board, time
-import random # Para eventos aleatórios
+import random  # Para geração aleatória de comida
 
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
@@ -364,147 +364,162 @@ from simpleio import map_range
 import neopixel
 from rainbowio import colorwheel
 
-from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
+from adafruit_pixel_framebuf import PixelFramebuf, VERTICAL
 
+# Configuração do joystick
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
 
+# Configuração do botão de disparo (trigger)
 trigger = DigitalInOut(board.D6)
 trigger.direction = Direction.INPUT
 trigger.pull = Pull.UP
 
+# Configuração da matriz de LEDs Neopixel
 pixel_pin = board.A0
 pixel_width = 16  
 pixel_height = 16
-num_tiles = 2
+num_tiles = 2  # Número de placas de matriz LED
 num_pixels = pixel_width * pixel_height * num_tiles
 
 pixels = neopixel.NeoPixel(
     pixel_pin,
     num_pixels, 
     brightness=0.2,
-    auto_write=False,
+    auto_write=False,  # Otimização: só atualiza quando chamarmos show()
 )
 
-screen = PixelFramebuffer(
+# Configuração do framebuffer para controlar a matriz de LEDs
+screen = PixelFramebuf(
     pixels,
     pixel_width * num_tiles,
     pixel_height,
-    orientation = VERTICAL,
-    rotation = 0
+    orientation=VERTICAL,
+    rotation=0
 )
 
-# A função get_direction é uma variação da get_joystick, mais útil para o jogo Snake.
-# Ela compara os valores absolutos de x e y para determinar a direção do movimento.
-# Sem essa implementação, a serpente colide muitas vezes com o próprio corpo.
-
+# FUNÇÃO: Obtém direção do joystick para movimento da serpente
+# Esta versão é otimizada para o jogo Snake, comparando valores absolutos
+# para determinar se o movimento é prioritariamente horizontal ou vertical
 def get_direction():
+    # Mapeia valores analógicos (0-65535) para direções (-1, 0, 1)
     x = int(map_range(joystick_x.value, 0, 65535, 1.5, -1.5))
-    y = int(map_range(joystick_y.value, 0, 65535,  -1.5, 1.5))
+    y = int(map_range(joystick_y.value, 0, 65535, -1.5, 1.5))
+    
+    # Decide se o movimento é horizontal ou vertical baseado no maior valor absoluto
     if abs(x) > abs(y):
-        return (0, x)  # Horizontal Move
+        return (0, x)  # Movimento Horizontal (esquerda/direita)
     else:
-        return (y, 0)  # Vertical Move
+        return (y, 0)  # Movimento Vertical (cima/baixo)
 
-# A função get_joystick foi mantida apenas para comparação das diferenças
-def get_joystick():
-    # Returns -1 0 or 1 depending on joystick position
-    x_coord = int (map_range (joystick_x.value, 200, 65535, - 2 , 2))
-    y_coord = int (map_range (joystick_y.value, 200, 65535, - 2 , 2))
-    return x_coord, y_coord
-
+# FUNÇÃO: Obtém cor do pixel em coordenadas específicas
 def get_pixel_color(x, y):
-    # Primeiro checa se as coordenadas x e y estão nos limites da tela
+    # Primeiro verifica se as coordenadas estão dentro dos limites da tela
     if (0 <= x < screen.width) and (0 <= y < screen.height):
-        # Recebe o valor da cor, na posição do pixel
+        # Obtém o valor da cor do pixel na posição (x, y)
         rgbint = screen.pixel(x, y)
         return (rgbint >> 16 & 0xFF, rgbint >> 8 & 0xFF, rgbint & 0xFF)
-
-    # Return preto (0, 0, 0) se estiver fora dos limites
+    
+    # Retorna preto (0, 0, 0) se estiver fora dos limites
     return (0, 0, 0)
 
+# FUNÇÃO: Verifica se há parede/obstáculo na posição
 def check_wall(x, y, wall_color):
-    # checa primeiro os limites da tela
-    if x < 0 or x >= screen.width  or y < 0 or y >= screen.height :
+    # Primeiro verifica os limites da tela (bordas)
+    if x < 0 or x >= screen.width or y < 0 or y >= screen.height:
         return False
-    # depois, checa as cores
+    
+    # Depois verifica a cor do pixel (se é parede)
     color = get_pixel_color(x, y)
     return color != wall_color
 
+# FUNÇÃO: Verifica se o pixel tem uma cor específica
 def check_color(x, y, colorcheck):
     colorcheck_rgb = ((colorcheck >> 16) & 0xFF, (colorcheck >> 8) & 0xFF, colorcheck & 0xFF)
     color = get_pixel_color(x, y)
     return color == colorcheck_rgb
 
-# Monta o corpo da serpente no centro da tela como uma lista, com três elementos inicialmente.
-# O primeiro elemento é a cabeça. E os outros dois, o corpo.
+# INICIALIZAÇÃO DO JOGO
+# Cria o corpo da serpente com 3 segmentos no centro da tela
+# snake_body[0] = cabeça, snake_body[1] e [2] = corpo
 snake_body = [
-    [screen.height // 2, screen.width // 2],
-    [screen.height // 2, screen.width // 2 - 1],
-    [screen.height // 2, screen.width // 2 - 2]
+    [screen.height // 2, screen.width // 2],      # Cabeça no centro
+    [screen.height // 2, screen.width // 2 - 1],  # Primeiro segmento do corpo
+    [screen.height // 2, screen.width // 2 - 2]   # Segundo segmento do corpo
 ]
 
-# Coloca a comida numa posição aleatória da Tela
+# Posiciona a comida em local aleatório na tela
 food = [random.randint(0, pixel_height - 1), random.randint(0, pixel_width - 1)]
 
-# Inicia sempre com a serpente se movendo da esquerda para a direita
+# Direção inicial: movendo para a direita (0, 1)
 direction = (0, 1)
 
+# FUNÇÃO: Gera nova comida em posição aleatória que não esteja na serpente
 def generate_food():
     global food
     while True:
+        # Gera coordenadas aleatórias dentro dos limites da tela
         food = [random.randint(0, pixel_height - 1), random.randint(0, pixel_width - 1)]
         
-        # Vê se a comida não foi gerada dentro do corpo da serpente
-		# como é aleatório, pode ser que isso aconteça...
+        # Verifica se a comida não foi gerada dentro do corpo da serpente
         if food not in snake_body:
-		    # Se não foi gerada dentro do corpo, interrompe o loop
+            # Se a posição é válida, interrompe o loop
             break
 
-# loop principal do jogo
+# LOOP PRINCIPAL DO JOGO
 while True:
-    # Lê o valor da direção a partir do joystick.
+    # LEITURA DE CONTROLES: Obtém nova direção do joystick
     new_direction = get_direction()
+    
+    # Verifica se a nova direção é válida (não é movimento nulo e não é oposta à direção atual)
+    # Isso previne que a serpente faça movimento de 180° (que causaria colisão consigo mesma)
     if new_direction != (0, 0) and (new_direction[0] != -direction[0] or new_direction[1] != -direction[1]):
-        direction = new_direction
+        direction = new_direction  # Atualiza a direção
 
-    # Reposiciona a cabeça segundo as novas coordenadas
+    # MOVIMENTO: Calcula nova posição da cabeça baseado na direção atual
     new_head = [snake_body[0][0] + direction[0], snake_body[0][1] + direction[1]]
 
-    # Checa se o jogo acabou. A serpente chegou nos limites da tela? Ou a cabeça está em colisão com o corpo?
+    # VERIFICAÇÃO DE COLIÇÃO: Game Over conditions
     if (
-        new_head[0] < 0 or new_head[0] >= screen.height  or
-        new_head[1] < 0 or new_head[1] >= screen.width or
-        new_head in snake_body
+        new_head[0] < 0 or new_head[0] >= screen.height or  # Colisão com borda superior/inferior
+        new_head[1] < 0 or new_head[1] >= screen.width or   # Colisão com borda esquerda/direita
+        new_head in snake_body                              # Colisão com o próprio corpo
     ):
-		# Se isso acontece, volta para a condição inicial.
+        # RESET DO JOGO: Volta para estado inicial
         snake_body = [
-            [screen.height // 2, screen.width // 2],
-            [screen.height // 2, screen.width // 2 - 1],
-            [screen.height // 2, screen.width // 2 - 2]
+            [screen.height // 2, screen.width // 2],      # Cabeça no centro
+            [screen.height // 2, screen.width // 2 - 1],  # Corpo
+            [screen.height // 2, screen.width // 2 - 2]   # Corpo
         ]
+        # Mantém a mesma direção ou pode resetar a direção aqui
     else:
-        snake_body.insert(0, new_head)
+        # MOVIMENTO VÁLIDO: Adiciona nova cabeça na frente
+        snake_body.insert(0, new_head)  # ⭐ Insere nova cabeça na posição 0
 
-        # Se a serpente comeu a comida, gera nova comida
-        if snake_body[0] == food: #snake_body[0] é a cabeça
-            generate_food()
+        # VERIFICA SE COMEU A COMIDA: Compara posição da cabeça com posição da comida
+        if snake_body[0] == food:  # snake_body[0] é a cabeça
+            # ⭐⭐ CRESCIMENTO DA SERPENTE ⭐⭐
+            # Gera nova comida mas NÃO remove a cauda
+            generate_food()  # Isso faz a serpente crescer pois não há pop()
         else:
-            snake_body.pop()
+            # Movimento normal: remove a última parte da cauda para manter tamanho
+            snake_body.pop()  # Remove o último elemento da lista (a cauda)
 
-        # Clear screen and draw
-        screen.fill(0)
+        # RENDERIZAÇÃO: Atualiza a tela
+        screen.fill(0)  # Limpa a tela (preto)
         
-        # Draw snake head and body
+        # Desenha a serpente: cada segmento em verde
         for segment in snake_body:
-            screen.pixel(segment[1], segment[0], 0x00FF00)  # Snake
+            screen.pixel(segment[1], segment[0], 0x00FF00)  # Verde para a serpente
         
-        # Draw Food
-        screen.pixel(food[1], food[0], 0xFF0000)
+        # Desenha a comida: vermelho
+        screen.pixel(food[1], food[0], 0xFF0000)  # Vermelho para a comida
         
-        # Show everything
+        # Atualiza a exibição na matriz de LEDs
         screen.display()
-        time.sleep(0.1)
+        
+        # Controla a velocidade do jogo
+        time.sleep(0.1)  # Ajuste este valor para mudar a dificuldade
 
 ```
 
