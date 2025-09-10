@@ -130,6 +130,7 @@ screen = PixelFramebuffer(
     rotation = 0, #Vai de 0 a 3, aumentando em 90 graus para cada
 	orientation = VERTICAL, # como elas estão dispostas
     reverse_x=True,# Use isso se o texto parecer espelhado no eixo horizontal
+)
 
 # Preenche a tela com a cor especificada.
 # Para essa biblioteca, a cor não é passada como uma tupla RGB e sim como uma sequência
@@ -522,7 +523,7 @@ com que facilidade se pode fazer isso...
 ```
 import time
 import board
-import neopixel_spi as neopixel
+import neopixel
 from rainbowio import colorwheel
 from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
