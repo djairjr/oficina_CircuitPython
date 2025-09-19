@@ -36,10 +36,13 @@ Vou deixar aqui uma lista razoável de recursos para você estudar. Se tiver alg
 [TinkerCad - Alguns circuitos simulados](https://www.tinkercad.com/users/eifWhqFqLlm?type=circuits)
 
 ## Pastas do Repositório
-[Datasheets Diversos](#) - Pinagens, manuais técnicos, especificações.
-[Eletrônica - Arduino Basic Connections](#) - Um livro bacana com as conexões necessárias para se ligar qualquer microcontrolador a vários dispositivos eletrônicos.
-[Python](#) - Livros para ensinar a programação em Python
-[Jogos Basic](#) - Uma coleção de livros da década de 80 com códigos de diversos jogos em Basic. Muito fácil de portar para CircuitPython e Neopixels.
+[Datasheets Diversos](https://github.com/djairjr/oficina_CircuitPython/tree/main/Referencias/Datasheets) - Pinagens, manuais técnicos, especificações.
+
+[Eletrônica - Arduino Basic Connections](https://github.com/djairjr/oficina_CircuitPython/tree/main/Referencias/Eletronica) - Um livro bacana com as conexões necessárias para se ligar qualquer microcontrolador a vários dispositivos eletrônicos.
+
+[Python](https://github.com/djairjr/oficina_CircuitPython/tree/main/Referencias/Python) - Livros para ensinar a programação em Python
+
+[Jogos Basic](https://github.com/djairjr/oficina_CircuitPython/tree/main/Referencias/Jogos_Basic) - Uma coleção de livros da década de 80 com códigos de diversos jogos em Basic. Muito fácil de portar para CircuitPython e Neopixels.
 
 
 
