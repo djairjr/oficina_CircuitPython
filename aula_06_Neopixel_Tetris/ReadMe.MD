@@ -3,6 +3,7 @@ Eu estou compartilhando o código completo do jogo, mas achei útil explicar cad
 
 ## 📐 Sistema de Desenho dos Tetrônimos
 
+O nome Tetris vem do fato de cada peça do jogo ser representada por diferentes combinações de quatro quadrados. As peças são chamadas tetrônimos.
 Os tetrônimos são representados como listas de tuplas, onde cada tupla `(linha, coluna)` indica a posição de um bloco dentro de uma grade 4x4. 
 O sistema usa coordenadas relativas onde (0,0) é o canto superior esquerdo da peça. 
 Por exemplo:

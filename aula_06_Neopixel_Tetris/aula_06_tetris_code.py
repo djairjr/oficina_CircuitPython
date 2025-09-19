@@ -13,20 +13,11 @@ pixel_pin = board.A0
 pixel_width = 16
 pixel_height = 16
 
-# Configurações do joystick
-joystick_x = AnalogIn(board.A1)
-joystick_y = AnalogIn(board.A2)
-
-# Configuração do botão
-trigger = DigitalInOut(board.D6)
-trigger.direction = Direction.INPUT
-trigger.pull = Pull.UP
-
 # Inicialização dos pixels NeoPixel
 pixels = neopixel.NeoPixel(
     pixel_pin,
     pixel_width * pixel_height, 
-    brightness=0.2,
+    brightness=0.1,
     auto_write=False,
 )
 
@@ -36,10 +27,18 @@ screen = PixelFramebuffer(
     pixel_width,
     pixel_height,
     rotation=0,
-    reverse_x=True, 
 )
 
 screen.fill(0)
+
+# Configurações do joystick
+joystick_x = AnalogIn(board.A1)
+joystick_y = AnalogIn(board.A2)
+
+# Configuração do botão
+trigger = DigitalInOut(board.D6)
+trigger.direction = Direction.INPUT
+trigger.pull = Pull.UP
 
 # Cores do jogo
 COLORS = [
@@ -54,16 +53,18 @@ COLORS = [
 ]
 
 # Constantes do jogo
-FIELD_HEIGHT = 16
-FIELD_WIDTH = 16
+FIELD_HEIGHT = pixel_height
+FIELD_WIDTH = pixel_width
 SCORE_PER_ELIMINATED_LINES = (0, 40, 80, 120, 600)
 SCORE_PER_FIXED_PIECE = 5
 
-# Formatos dos tetrominos
+# Formatos dos tetrominos, que são as peças do jogo.
+# O jogo se chama TETRIS, porque as peças são formadas
+# por quatro quadrados dispostos de forma diferente
 TETROMINOS = [
     [(0, 0), (0, 1), (1, 0), (1, 1)],  # O Square
     [(0, 0), (0, 1), (1, 1), (2, 1)],  # L
-    [(0, 1), (1, 1), (2, 1), (2, 0)],  # J
+    [(0, 1), (1, 1), (2, 1), (2, 0)],  # J ou L espelhado
     [(0, 1), (1, 0), (1, 1), (2, 0)],  # Z
     [(0, 1), (1, 0), (1, 1), (2, 1)],  # T
     [(0, 0), (1, 0), (1, 1), (2, 1)],  # S
@@ -71,7 +72,7 @@ TETROMINOS = [
 ]
 
 # Variáveis globais do jogo
-field = []
+field = [] # Campo do jogo
 score = 0
 last_printed_score = -1  # Inicializa com valor diferente do score inicial
 level = 0
@@ -90,11 +91,15 @@ def get_joystick():
 def reset_tetromino():
     global tetromino, tetromino_color, tetromino_offset, game_over
     
+    # Escolhe aleatoriamente um tetromino da lista
     tetromino = random.choice(TETROMINOS)[:]
+    # Atribui uma cor aleatória a ele
     tetromino_color = random.randint(1, len(COLORS) - 1)
+    # Posiciona ele fora da tela, na metade da largura
     tetromino_offset = [-2, FIELD_WIDTH // 2]
     
-    # Verifica se o jogo acabou
+    # Verifica se o jogo acabou - Quando não houver nenhuma célula vazia
+    # nas coordenadas do tetromino
     game_over = any(not is_cell_free(r, c) for (r, c) in get_tetromino_coords())
 
 def get_tetromino_coords():
@@ -142,7 +147,7 @@ def move_tetromino(dr, dc):
         if not game_over:
             apply_tetromino()
 
-def rotate_tetromino():
+def rotate_tetromino(): #90 Graus - Troca linha por coluna e coluna por linha
     global tetromino, tetromino_offset, game_over
     
     if game_over:
