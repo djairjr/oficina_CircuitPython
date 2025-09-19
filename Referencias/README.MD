@@ -16,6 +16,8 @@ Vou deixar aqui uma lista razoável de recursos para você estudar. Se tiver alg
 
 [Newsletter da Adafruit Industries](https://www.adafruitdaily.com/)
 
+[CircuitPython Neomatrix](https://github.com/pagong/circuitpython_neomatrix) - outra solução para usar Neopixels como Tela.
+
 [Minha Página no Hackster.io](https://www.hackster.io/nicolaudosbrinquedos/projects)
 
 
