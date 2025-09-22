@@ -5,15 +5,21 @@ from simpleio import map_range
 import adafruit_rtttl
 
 import neopixel
-from adafruit_pixel_framebuf import PixelFramebuf, VERTICAL
+from adafruit_pixel_framebuf import PixelFramebuffer, VERTICAL
 
 from rainbowio import colorwheel
 import framebufferio
 
+# DisplayIO para trabalhar com fontes bitmap
+from displayio import Bitmap
+from adafruit_display_text.bitmap_label import Label
+from adafruit_bitmap_font import bitmap_font
+import terminalio
+
 pixel_pin = board.A0
 pixel_width = 16
 pixel_height = 16
-num_tiles = 2
+num_tiles = 1
 
 joystick_x = AnalogIn(board.A1)
 joystick_y = AnalogIn(board.A2)
@@ -26,18 +32,28 @@ buzzer = board.D7
 
 pixels = neopixel.NeoPixel(
     pixel_pin,
-    pixel_width * pixel_height * num_tiles, # dont forget to multiply for num_tiles
+    pixel_width * pixel_height * num_tiles,
     brightness=0.1,
     auto_write=False,
 )
 
-screen = PixelFramebuf(
+screen = PixelFramebuffer(
     pixels,
     pixel_width * num_tiles,
     pixel_height,
-    orientation = VERTICAL,
-    rotation = 0
+    orientation=VERTICAL,
+    rotation=0
 )
+
+font = bitmap_font.load_font("/fonts/tom-thumb.pcf", Bitmap)
+msg_game = Label(text="GAME", font=font)
+msg_over = Label(text="OVER", font=font)
+msg_level = Label(text="LVL", font=font)
+    
+game_bitmap = msg_game.bitmap
+over_bitmap = msg_over.bitmap
+level_bitmap = msg_level.bitmap
+
 
 # Creating colors
 COLORS = [
@@ -48,23 +64,56 @@ COLORS = [
     0x00FF00,  # Green
     0x0000FF,  # Blue
     0x4B0082,  # Indigo
-    0x8B00FF   # Violet
+    0x8B00FF,   # Violet
+    0xFFFFFF   # White
 ]
 
 def get_joystick():
-    x_coord = int(map_range(joystick_x.value, 200, 65535, -2, 2))
+    x_coord = int(map_range(joystick_x.value, 200, 65535, 2, -2))
     y_coord = int(map_range(joystick_y.value, 200, 65535, -2, 2))
     return x_coord, y_coord
 
 # Sounds
 def shoot_sound():
     adafruit_rtttl.play(buzzer, "shoot:d=4,o=5,b=880:8c6")
-    
+
+def explosion_sound():
+    adafruit_rtttl.play(buzzer, "Explosion:d=4,o=3,b=100:32c2,32c1")
+
+def level_up_sound():
+    adafruit_rtttl.play(buzzer, "LevelUp:d=4,o=5,b=200:16e5,16g5")
+
+def game_over_sound():
+    adafruit_rtttl.play(buzzer, "GameOver:d=4,o=3,b=80:32c3,32c2,32c1,32c2,32c3")
+
 def xevious_sound():
     adafruit_rtttl.play(buzzer, "Xevious:d=4,o=5,b=160:16c,16c6,16b,16c6,16e6,16c6,16b,16c6,16c,16c6,16a#,16c6,16e6,16c6,16a#,16c6,16c,16c6,16a,16c6,16e6,16c6,16a,16c6,16c,16c6,16g#,16c6,16e6,16c6,16g#,16c6")
 
 def galaga_sound():
     adafruit_rtttl.play(buzzer, "Galaga:d=4,o=5,b=125:8g4,32c,32p,8d,32f,32p,8e,32c,32p,8d,32a,32p,8g,32c,32p,8d,32f,32p,8e,32c,32p,8g,32b,32p,8c6,32a#,32p,8g#,32g,32p,8f,32d#,32p,8d,32a#4,32p,8a#,32c6,32p,8a#,32g,32p,16a,16f,16d,16g,16e,16d")
+
+# Função para desenhar texto usando a fonte bitmap
+def draw_bitmap_text(bitmap, x, y, color):
+    for dy in range(bitmap.height):
+        for dx in range(bitmap.width):
+            if bitmap[dx, dy]:
+                screen.pixel(x + dx, y + dy, color)
+
+def show_game_over():
+    screen.fill(0)
+    draw_bitmap_text(game_bitmap, (screen.width - game_bitmap.width) // 2, 2, COLORS[1])
+    draw_bitmap_text(over_bitmap, (screen.width - over_bitmap.width) // 2, 8, COLORS[1])
+    screen.display()
+
+def show_level(level_num):
+    screen.fill(0)
+    draw_bitmap_text(level_bitmap, (screen.width - level_bitmap.width) // 2, 1, COLORS[5])
+    level_num_text = Label(text=str(level_num), font=font)
+    num_bitmap = level_num_text.bitmap
+    draw_bitmap_text(num_bitmap, (screen.width - num_bitmap.width) // 2, 7, COLORS[5])
+    screen.display()
+    level_up_sound()
+    time.sleep(1.5)
 
 class Invader:
     def __init__(self, x, y):
@@ -82,31 +131,38 @@ class Invader:
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
+        # Verificar limites horizontais
         if self.x < 0 or self.x >= screen.width - 1:
             self.x = -1
+        # Verificar limites verticais (modo reverso)
+        if reverse and self.y < 0:
+            self.y = 0  # Impede que suba além do topo
+        # Verificar limites verticais (modo normal)
+        if not reverse and self.y >= screen.height - 1:
+            self.y = screen.height - 2  # Impede que desça além da base
 
     def shoot(self):
         return Projectile(self.x + 1, self.y + 2, COLORS[1])
 
 class PlayerShip:
     def __init__(self):
-        # Posição X: centro da tela (metade da largura menos metade da largura da nave)
         self.x = (screen.width - 3) // 2
-        # Posição Y: base da tela (altura da tela menos altura da nave)
-        self.y = screen.height - 2  # A nave tem 2 pixels de altura
+        self.y = screen.height - 2
         self.lives = 3
         self.exploding = False
         self.explode_timer = 0
+        self.explode_duration = 0.5
 
     def draw(self):
-        if self.exploding:
+        current_time = time.monotonic()
+        if self.exploding and current_time - self.explode_timer < self.explode_duration:
             self.draw_explosion()
         else:
-            # Desenha a nave do jogador (formato de triângulo)
-            screen.pixel(self.x, self.y, COLORS[5])        # Ponto esquerdo inferior
-            screen.pixel(self.x + 1, self.y, COLORS[5])    # Ponto central inferior
-            screen.pixel(self.x + 1, self.y - 1, COLORS[5]) # Ponto central superior
-            screen.pixel(self.x + 2, self.y, COLORS[5])    # Ponto direito inferior
+            self.exploding = False
+            screen.pixel(self.x, self.y, COLORS[5])
+            screen.pixel(self.x + 1, self.y, COLORS[5])
+            screen.pixel(self.x + 1, self.y - 1, COLORS[5])
+            screen.pixel(self.x + 2, self.y, COLORS[5])
 
     def draw_explosion(self):
         screen.pixel(self.x, self.y, COLORS[1])
@@ -115,26 +171,23 @@ class PlayerShip:
         screen.pixel(self.x + 2, self.y, COLORS[1])
 
     def draw_lives(self):
-        total_width = self.lives * 2 + (self.lives - 1) * 1
+        total_width = self.lives * 1 + (self.lives - 1) * 1
         start_x = (screen.width - total_width) // 2
         for i in range(self.lives):
-            x_offset = start_x + i * 3
-            for dx in range(2):
-                for dy in range(2):
-                    # Usando screen.height - 2 para ficar na parte inferior da tela
-                    screen.pixel(x_offset + dx, screen.height - 2 + dy, COLORS[5])
+            x_offset = start_x + i * 2
+            screen.pixel(x_offset, screen.height - 1, COLORS[8])
 
     def move(self, dx):
         self.x += dx
-        # Limita o movimento dentro dos limites da tela
         if self.x < 0:
             self.x = 0
-        if self.x >= screen.width - 3:  # 3 é a largura da nave
+        if self.x >= screen.width - 3:
             self.x = screen.width - 4
 
     def explode(self):
         self.exploding = True
         self.explode_timer = time.monotonic()
+        explosion_sound()  # Som de explosão
 
 class Projectile:
     def __init__(self, x, y, color):
@@ -160,19 +213,19 @@ level = 1
 invader_move_direction = 1
 invader_speed = 0.1
 game_over = False
-reverse = False
+invader_descent_amount = 0
 last_update_time = time.monotonic()
 last_shot_time = 0
+reverse = False
 
 def resetinvaders():
     global invaders
     invaders = []
-    # Posiciona os invasores na parte superior da tela
-    for i in range(4):
-        for j in range(4):
-            # Centraliza os invasores horizontalmente
-            start_x = (screen.width - 16) // 2  # 16 = 4 invasores * 4 pixels de espaçamento
-            invaders.append(Invader(start_x + i * 4, j * 2))
+    # Posiciona 3 linhas de invasores
+    for i in range(4):  # 4 colunas
+        for j in range(2):  # 2 linhas
+            start_x = (screen.width - (4 * 3)) // 2
+            invaders.append(Invader(start_x + i * 3, j * 3))
 
 def draw_game():
     gc.collect()
@@ -190,25 +243,19 @@ def draw_game():
     for projectile in enemy_projectiles:
         projectile.draw()
         
-    if game_over:
-        screen.fill(0)
-        print('Game Over')
-        xevious_sound()
-        
     screen.display()
 
 def update_game(dt):
-    global invaders, projectiles, enemy_projectiles, score, game_over, reverse
-    global invader_move_direction, last_shot_time
+    global invaders, projectiles, enemy_projectiles, score, game_over, invader_move_direction, invader_descent_amount
+    global last_shot_time, level, reverse
     
     gc.collect()
     dx, dy = get_joystick()
-    player_ship.move(dy)
+    player_ship.move(dx)
     
     # Disparar com botão
     current_time = time.monotonic()
     if not trigger.value and current_time - last_shot_time > 0.2:
-        # Dispara do centro da nave (x + 1)
         projectiles.append(Projectile(player_ship.x + 1, player_ship.y - 1, COLORS[7]))
         last_shot_time = current_time
         shoot_sound()
@@ -227,17 +274,9 @@ def update_game(dt):
                 if projectile in projectiles:
                     projectiles.remove(projectile)
                 score += 10
-                print('{0:04}'.format(score))
-                if score % 1000 == 0:
+                print('Score: {0:04}'.format(score))
+                if score % 100 == 0:
                     player_ship.lives += 1
-                break
-
-        # Check for collision with enemy projectiles
-        for enemy_projectile in enemy_projectiles[:]:
-            if projectile.x == enemy_projectile.x and projectile.y == enemy_projectile.y:
-                enemy_projectiles.remove(enemy_projectile)
-                if projectile in projectiles:
-                    projectiles.remove(projectile)
                 break
 
     # Move enemy projectiles
@@ -247,45 +286,69 @@ def update_game(dt):
             enemy_projectiles.remove(projectile)
 
         # Check for collision with player ship
-        if player_ship.x <= projectile.x < player_ship.x + 3 and player_ship.y <= projectile.y < player_ship.y + 3:
+        if player_ship.x <= projectile.x < player_ship.x + 3 and player_ship.y <= projectile.y < player_ship.y + 2:
             player_ship.lives -= 1
             player_ship.explode()
             enemy_projectiles.remove(projectile)
             if player_ship.lives <= 0:
                 game_over = True
+                game_over_sound()
+            # Log para debug
+            print(f"Player hit by enemy projectile! Lives remaining: {player_ship.lives}")
 
-    # Move invaders
+    # Variável para controlar se houve colisão com invasor
+    player_hit_by_invader = False
+    
+    # Move invaders and check collision with player ship
     for invader in invaders[:]:
         invader.move(invader_move_direction, 0)
 
         # Check collision between invaders and player ship
-        if invader.x <= player_ship.x < invader.x + invader.width and invader.y <= player_ship.y < invader.y + invader.height:
-            player_ship.lives -= 1
+        if (invader.x <= player_ship.x < invader.x + invader.width and 
+            invader.y <= player_ship.y < invader.y + invader.height):
+            player_hit_by_invader = True
             invaders.remove(invader)
-            if player_ship.lives <= 0:
-                game_over = True
+            # Não processar game over aqui ainda
 
-    # Check for invader edge collision
+    # Processar colisão com invasor APÓS remover todos os invasores colididos
+    if player_hit_by_invader:
+        player_ship.lives -= 1
+        player_ship.explode()
+        reverse = True
+        if player_ship.lives <= 0:
+            game_over = True
+            game_over_sound()
+        # Log para debug
+        print(f"Player collided with invader! Lives remaining: {player_ship.lives}")
+
+    # Check for invader edge collision (horizontal)
     if any(invader.x >= screen.width - 2 or invader.x <= 0 for invader in invaders):
         invader_move_direction *= -1
+        
+        # Adicionar descento para todos os inimigos
         for invader in invaders:
             if not reverse:
-                invader.move(0, 1)
+                invader.move(0, 1)  # Mover para baixo
             else:
-                invader.move(0, -1)
-
-    # Check if invader is near player ship
-    if any(invader.y >= player_ship.y - 1 for invader in invaders):
-        reverse = True
-    if any(invader.y <= 0 for invader in invaders):
-        reverse = False
+                invader.move(0, -1)  # Mover para cima
+    
+    # Nova verificação: colisão com o topo no modo reverso
+    if reverse and any(invader.y <= 0 for invader in invaders):
+        # Inverte a direção vertical quando atinge o topo
+        for invader in invaders:
+            invader.move(0, 1)  # Começa a descer
+        reverse = False  # Desativa o modo reverso
 
     # Enemy shooting
-    if len(invaders) <= 3 and random.random() < 0.03:
+    if len(invaders) > 0 and len(invaders) <= 3 and random.random() < 0.03:
         shooter = random.choice(invaders)
         enemy_projectiles.append(shooter.shoot())
 
-    if not invaders:
+    # VERIFICAÇÃO DE LEVEL UP DEVE VIR POR ÚLTIMO
+    if not invaders and not game_over:  # Só avança de nível se o jogo não acabou
+        # Level up!
+        level += 1
+        show_level(level)
         screen.fill(0)
         screen.display()
         projectiles[:] = []
@@ -295,7 +358,7 @@ def update_game(dt):
 
 def reset_game():
     global invaders, player_ship, projectiles, enemy_projectiles
-    global score, level, invader_move_direction, game_over, reverse
+    global score, level, invader_move_direction, game_over, invader_descent_amount, reverse
     
     screen.fill(0)
     screen.display()
@@ -308,6 +371,7 @@ def reset_game():
     level = 1
     invader_move_direction = 1
     game_over = False
+    invader_descent_amount = 0
     reverse = False
     
     resetinvaders()
@@ -316,18 +380,25 @@ def reset_game():
 
 # Inicializar o jogo
 reset_game()
+last_button_press = time.monotonic()
 
 # Loop principal do jogo
 while True:
+    current_time = time.monotonic()
+    
+    # Verifica se o botão foi pressionado para resetar o jogo
+    if not trigger.value and current_time - last_button_press > 0.5:
+        if game_over:
+            reset_game()
+        last_button_press = current_time
+    
     if not game_over:
-        current_time = time.monotonic()
         dt = current_time - last_update_time
         last_update_time = current_time
         update_game(dt)
         draw_game()
         time.sleep(0.02)
     else:
-        # Aguardar reinício do jogo (pode adicionar lógica para reiniciar com um botão)
-        time.sleep(1)
-        # Para reiniciar automaticamente, descomente a linha abaixo:
-        # reset_game()
+        # Mostra tela de Game Over
+        show_game_over()
+        time.sleep(0.1)

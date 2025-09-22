@@ -53,12 +53,7 @@ BLUE = 0x0000FF  # Cor para visualização do algoritmo
 CELL_SIZE = 1  # Tamanho de cada célula em pixels (1 para 16x16)
 MAZE_CELLS = 16 // CELL_SIZE  # Número de células que cabem na tela
 
-# Função para ler o joystick
-def get_joystick():
-    # Retorna -1, 0 ou 1 dependendo da posição do joystick
-    x_coord = int(map_range(joystick_x.value, 200, 65535, -2, 2))
-    y_coord = int(map_range(joystick_y.value, 200, 65535, -2, 2))
-    return x_coord, y_coord
+
 
 # Função alternativa para embaralhar lista
 def shuffle_list(lst):
@@ -110,7 +105,7 @@ class Maze:
         
         # Atualiza a tela
         screen.display()
-        time.sleep(0.05)  # Pequena pausa para visualização
+        time.sleep(0.005)  # Pequena pausa para visualização
 
     def generate(self):
         # Inicializa o labirinto com paredes (1 = parede, 0 = caminho, 2 = saída)
@@ -218,8 +213,8 @@ class Game:
         self.history_size = 3
         
         # Configurações do joystick
-        self.joystick_deadzone = 0.2  # Zona morta para evitar movimento acidental
-        self.last_joystick_pos = (0.5, 0.5)  # Posição central normalizada
+        #self.joystick_deadzone = 0.2  # Zona morta para evitar movimento acidental
+        #self.last_joystick_pos = (0.5, 0.5)  # Posição central normalizada
         
     def setup_display(self):
         # Limpa a tela
@@ -263,28 +258,18 @@ class Game:
             
         screen.pixel(player_x, player_y, color)
     
-    def get_joystick_direction(self):
-        """Lê o joystick usando a função fornecida e retorna a direção do movimento"""
-        x_coord, y_coord = get_joystick()
+    # Função para ler o joystick
+    def get_joystick(self):
+        global joystick_x, joystick_y
+        dx = int(map_range(joystick_x.value, 0, 65535, 1, -1))
+        dy = int(map_range(joystick_y.value, 0, 65535,  -1, 1))
+        if abs(dx) > abs(dy):
+            return (0, dx)  # Horizontal Move
+        else:
+            return (dy, 0)  # Vertical Move
         
-        # Converte os valores -2, -1, 0, 1, 2 para -1, 0, 1
-        dx = 0
-        dy = 0
-        
-        if x_coord < 0:
-            dx = -1
-        elif x_coord > 0:
-            dx = 1
-            
-        if y_coord < 0:
-            dy = -1
-        elif y_coord > 0:
-            dy = 1
-        
-        return dx, dy
-    
     def move_player(self):
-        dx, dy = self.get_joystick_direction()
+        dx, dy = self.get_joystick()
         
         if dx != 0 or dy != 0:
             new_cell_x = self.player_pos[0] + dx
