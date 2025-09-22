@@ -260,47 +260,47 @@ def update_game(dt):
         last_shot_time = current_time
         shoot_sound()
 
-    # Move player projectiles
-    for projectile in projectiles[:]:
+    # Move player projectiles (usando list() para cópia segura)
+    for projectile in list(projectiles):  # Corrigido: usando list() em vez de [:]
         projectile.move(-1)
         if projectile.y == -1:
             projectiles.remove(projectile)
+        else:
+            # Check for collision with invaders (usando list() para cópia segura)
+            for invader in list(invaders):  # Corrigido: usando list() em vez de [:]
+                if invader.x <= projectile.x < invader.x + 2 and invader.y <= projectile.y < invader.y + 2:
+                    invaders.remove(invader)
+                    shoot_sound()
+                    if projectile in projectiles:
+                        projectiles.remove(projectile)
+                    score += 10
+                    print('Score: {0:04}'.format(score))
+                    if score % 100 == 0:
+                        player_ship.lives += 1
+                    break
 
-        # Check for collision with invaders
-        for invader in invaders[:]:
-            if invader.x <= projectile.x < invader.x + 2 and invader.y <= projectile.y < invader.y + 2:
-                invaders.remove(invader)
-                shoot_sound()
-                if projectile in projectiles:
-                    projectiles.remove(projectile)
-                score += 10
-                print('Score: {0:04}'.format(score))
-                if score % 100 == 0:
-                    player_ship.lives += 1
-                break
-
-    # Move enemy projectiles
-    for projectile in enemy_projectiles[:]:
+    # Move enemy projectiles (usando list() para cópia segura)
+    for projectile in list(enemy_projectiles):  # Corrigido: usando list() em vez de [:]
         projectile.move(1)
         if projectile.y == -1:
             enemy_projectiles.remove(projectile)
-
-        # Check for collision with player ship
-        if player_ship.x <= projectile.x < player_ship.x + 3 and player_ship.y <= projectile.y < player_ship.y + 2:
-            player_ship.lives -= 1
-            player_ship.explode()
-            enemy_projectiles.remove(projectile)
-            if player_ship.lives <= 0:
-                game_over = True
-                game_over_sound()
-            # Log para debug
-            print(f"Player hit by enemy projectile! Lives remaining: {player_ship.lives}")
+        else:
+            # Check for collision with player ship
+            if player_ship.x <= projectile.x < player_ship.x + 3 and player_ship.y <= projectile.y < player_ship.y + 2:
+                player_ship.lives -= 1
+                player_ship.explode()
+                enemy_projectiles.remove(projectile)
+                if player_ship.lives <= 0:
+                    game_over = True
+                    game_over_sound()
+                # Log para debug
+                print(f"Player hit by enemy projectile! Lives remaining: {player_ship.lives}")
 
     # Variável para controlar se houve colisão com invasor
     player_hit_by_invader = False
     
-    # Move invaders and check collision with player ship
-    for invader in invaders[:]:
+    # Move invaders and check collision with player ship (usando list() para cópia segura)
+    for invader in list(invaders):  # Corrigido: usando list() em vez de [:]
         invader.move(invader_move_direction, 0)
 
         # Check collision between invaders and player ship
@@ -348,34 +348,48 @@ def update_game(dt):
     if not invaders and not game_over:  # Só avança de nível se o jogo não acabou
         # Level up!
         level += 1
+        
+        # 1. Limpar todos os projéteis ao completar o nível
+        projectiles.clear()  # Limpa projéteis do jogador
+        enemy_projectiles.clear()  # Limpa projéteis inimigos
+        
         show_level(level)
         screen.fill(0)
         screen.display()
-        projectiles[:] = []
-        enemy_projectiles[:] = []
         resetinvaders()
         xevious_sound()
 
 def reset_game():
     global invaders, player_ship, projectiles, enemy_projectiles
     global score, level, invader_move_direction, game_over, invader_descent_amount, reverse
+    global last_shot_time, last_update_time
     
-    screen.fill(0)
-    screen.display()
+    # Limpar todas as listas
+    invaders.clear()
+    projectiles.clear()
+    enemy_projectiles.clear()
     
-    invaders = []
+    # Resetar jogador
     player_ship = PlayerShip()
-    projectiles = []
-    enemy_projectiles = []
+    
+    # Resetar variáveis de estado do jogo
     score = 0
     level = 1
     invader_move_direction = 1
     game_over = False
     invader_descent_amount = 0
     reverse = False
+    last_shot_time = 0
+    last_update_time = time.monotonic()
     
+    # Reinicializar invasores
     resetinvaders()
-    draw_game()
+    
+    # Limpar tela
+    screen.fill(0)
+    screen.display()
+    
+    # Som de início
     galaga_sound()
 
 # Inicializar o jogo
@@ -386,19 +400,25 @@ last_button_press = time.monotonic()
 while True:
     current_time = time.monotonic()
     
-    # Verifica se o botão foi pressionado para resetar o jogo
-    if not trigger.value and current_time - last_button_press > 0.5:
-        if game_over:
+    if game_over:
+        # Mostra tela de Game Over
+        show_game_over()
+        
+        # 3. Aguardar pressionamento do botão para reiniciar
+        if not trigger.value and current_time - last_button_press > 0.5:
             reset_game()
-        last_button_press = current_time
-    
-    if not game_over:
+            last_button_press = current_time
+        time.sleep(0.1)
+    else:
+        # Jogo normal
         dt = current_time - last_update_time
         last_update_time = current_time
         update_game(dt)
         draw_game()
+        
+        # Verificar se o botão foi pressionado (para debug ou funcionalidades extras)
+        if not trigger.value and current_time - last_button_press > 0.5:
+            # Aqui você pode adicionar funcionalidades extras durante o jogo
+            last_button_press = current_time
+        
         time.sleep(0.02)
-    else:
-        # Mostra tela de Game Over
-        show_game_over()
-        time.sleep(0.1)
