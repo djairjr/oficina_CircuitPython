@@ -51,7 +51,7 @@ Para transformar uma fita de Led em tela, nós precisamos cortá-la em pedaços 
 
 Ainda assim, não conseguimos acessar os pontos dessa matriz usando um sistema de coordenadas do tipo linha, coluna. Precisamos criar isso através de software, usando bibliotecas específicas que fazem toda a matemática necessária.
 
-As fitas leds não interfaceadas pela biblioteca **Adafruit_Neopixel**, que assim como a SimpleIO não vem instalada por padrão. Nós precisamos adicioná-la usando o comando **circup install adafruit_neopixel**, no prompt de comando do nosso sistema operacional.
+As fitas leds são interfaceadas pela biblioteca **Adafruit_Neopixel**, que assim como a SimpleIO não vem instalada por padrão. Nós precisamos adicioná-la usando o comando **circup install adafruit_neopixel**, no prompt de comando do nosso sistema operacional.
 (Se você não entendeu nada do que eu falei, dê uma revisada nas duas primeiras aulas).
 ```
 import neopixel
