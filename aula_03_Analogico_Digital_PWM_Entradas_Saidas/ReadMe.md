@@ -32,7 +32,7 @@ Procurem a versão **Pre-Soldered**, porque já vem com os pinos todos soldados.
 Todo dispositivo eletrônico que você for utilizar terá um manual técnico chamado de **datasheet**.
 No CircuitPython, o módulo board é uma interface que permite que você acesse os pinos da plaquinha que você está utilizando com os mesmos nomes que você lê no **datasheet** do fabricante. Isso parece óbvio, mas nem sempre isso é feito em todas as linguagens. Para acessar qualquer um dos pinos indicados no diagrama abaixo, você vai precisar importar o módulo board e em seguida, identificar o pino com o nome board.PINO
 
-![Datasheet da Xiao RP2040](https://github.com/djairjr/oficina_CircuitPython/blob/main/aula_03_Digitalio_Analogio_PWMio/Seeedstudio-Seeeduino-XIAO-RP2040-Microcontroller-Board-Pinout-Diagram-1-1536x1046.jpg?raw=true)
+![Datasheet da Xiao RP2040](https://github.com/djairjr/oficina_CircuitPython/blob/main/Referencias/Datasheets/Seeed_Xiao_RP2040_Pinout.jpg)
 
 Na nossa montagem de aula, vamos ligar um botão como entrada no pino D6 e um LED como saída no pino D7. Nós podemos criar duas variáveis e indicar isso, por exemplo.
 ```
