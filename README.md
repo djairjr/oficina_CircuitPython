@@ -53,15 +53,15 @@ em Python.
 (https://solyd.com.br/cursos/python-basico/)
 
 Também gosto muito de literatura específica para Python. O melhor livro para iniciantes é o 
-do professor **Nilo Ney Coutinho Menezes**. "Introdução a Programação com Python". É vendido
-pela Novatec, mas pode ser encontrado on-line na Archive.org.
+do professor **Nilo Ney Coutinho Menezes**. ["Introdução a Programação com Python"](https://ia804504.us.archive.org/8/items/nilo-ney-coutinho-menezes-introducao-a-programacao-com-python-algoritmos-e-logic/Nilo%20Ney%20Coutinho%20Menezes%20-%20Introdu%C3%A7%C3%A3o%20%C3%A0%20programa%C3%A7%C3%A3o%20com%20Python_%20algoritmos%20e%20l%C3%B3gica%20de%20programa%C3%A7%C3%A3o%20para%20iniciantes-Novatec%20%282014%29.pdf). É vendido
+pela [Novatec](https://python.nilo.pro.br/), mas pode ser encontrado on-line na Archive.org.
 
-(https://ia804504.us.archive.org/8/items/nilo-ney-coutinho-menezes-introducao-a-programacao-com-python-algoritmos-e-logic/Nilo%20Ney%20Coutinho%20Menezes%20-%20Introdu%C3%A7%C3%A3o%20%C3%A0%20programa%C3%A7%C3%A3o%20com%20Python_%20algoritmos%20e%20l%C3%B3gica%20de%20programa%C3%A7%C3%A3o%20para%20iniciantes-Novatec%20%282014%29.pdf)
+
 
 Essa lista possui os principais comandos de Python e a maioria deles vai funcionar em Circuitpython.
 Python CheatSheet.(https://www.pythoncheatsheet.org/)
 
-No site da Adafruit você vai encontrar toda sorte de tutoriais para utilizar CircuitPython.
+No site da **Adafruit** você vai encontrar toda sorte de tutoriais para utilizar **CircuitPython**.
 Tudo é bastante modular, cada biblioteca é bem explicada com exemplos úteis e funcionais.
 
 **Indico especialmente esses:** 
