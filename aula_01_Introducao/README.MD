@@ -87,7 +87,7 @@ for pin in dir (microcontroller.pin):
 
 # Os Módulos Digitalio, Analogio e PWMio
 Todo o material da oficina do Sesc Santana sobre o assunto está aqui:
-https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_3_Digitalio_Analogio_PWMio
+https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_03_Analogico_Digital_PWM_Entradas_Saidas
 
 No site da Adafruit, tem o excelente tutorial de Inicio em Circuitpython:
 https://learn.adafruit.com/circuitpython-essentials
@@ -106,7 +106,7 @@ PWMIo, dá conta das saídas e entradas Moduladas por Pulso. No nosso caso, são
 de som RTTTL, que vai reproduzir os sons no Buzzer.
 
 # O Módulo BUSIO e os Buses SPI, I2C e UART
-https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_4_Busio_I2C_SPI_UART
+https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_08_Barramentos_Seriais
 Para os nossos joguinhos, o único que vai nos interessar é o Bus SPI. Nós vamos usar um Hack
 da biblioteca Neopixel que utiliza o barramento SPI para garantir maior velocidade nas
 transações. 
@@ -139,7 +139,7 @@ Dá conta de todo o recado, todas as explicações e todo o funcionamento das fi
 Inclusive no Arduino.
 
 No link abaixo, estão os exercícios da aula de Neopixel na oficina do Sesc Santana:
-https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_6_Neopixel
+https://github.com/djairjr/oficina_CircuitPython/tree/main/aula_04_Neopixel
 
 O painel 8x32 que estamos utilizando é um arranjo em zig zag de uma fita de Led Neopixel.
 
