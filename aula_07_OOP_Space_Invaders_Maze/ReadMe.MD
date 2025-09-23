@@ -232,9 +232,10 @@ def galaga_sound():
     adafruit_rtttl.play(buzzer, "Galaga:d=4,o=5,b=125:8g4,32c,32p,8d,32f,32p,8e,32c,32p,8d,32a,32p,8g,32c,32p,8d,32f,32p,8e,32c,32p,8g,32b,32p,8c6,32a#,32p,8g#,32g,32p,8f,32d#,32p,8d,32a#4,32p,8a#,32c6,32p,8a#,32g,32p,16a,16f,16d,16g,16e,16d")
 
 ```
-# **🎮 SPACE INVADERS - EXPLICAÇÃO COMPLETA DE POO**
+# **🎮 SPACE INVADERS - PROGRAMAÇÃO ORIENTADA A OBJETOS? POO**
 
-## **🤔 O QUE É PROGRAMAÇÃO ORIENTADA A OBJETOS?**
+Nessa última aula, pensei em dar uma pincelada sobre programação orientada a objetos, mostrando uma versão do código de Space Invaders utilizando essa abordagem.
+Na realidade, desde a primeira vez que nós importamos uma biblioteca, já estamos utilizando essa abordagem. Mas não tínhamos discutido muito sobre esse caminho de programação.
 
 **POO é como criar "mini-mundos" no código** onde cada coisa é um objeto que sabe:
 - **O que é** (seus dados/atributos)
@@ -402,7 +403,7 @@ if inimigo1.x >= screen.width:  # O inimigo sabe sua posição
 ## **🎮 COMO TUDO SE CONECTA**
 
 1. **Bibliotecas** usam POO para nos dar ferramentas simples (`pixels`, `screen`)
-2. **Nosso jogo** usa POO para criar personagens inteligentes
+2. **Space Invaders** usa POO para criar personagens inteligentes (PlayerShip, Invader, Projectile)
 3. **Cada objeto** cuida de si mesmo: sabe onde está, como se desenhar, como se mover
 4. **O código principal** fica limpo: só orquestra os objetos
 
@@ -605,7 +606,7 @@ while True:
         # reset_game()    # Descomente para reinício automático
 ```
 
-## **📊 FLUXO DO JOGO:**
+## **📊 FLUXO DO JOGO EM POO:**
 1. **Inicialização** → Cria jogador, inimigos, zera pontuação
 2. **Loop Principal** → Atualiza → Desenha → Repete
 3. **Colisões** → Verifica tiros, movimentos, limites
